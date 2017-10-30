@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:test="http://www.apitest.com/schema/apiTest"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.apitest.com/schema/apiTest http://www.apitest.com/schema/apiTest/apiTest.xsd">
+
+    <test:systemTime id="systemTimeBeanDefinitionParserTest_pure"/>
+
+    <test:systemTime id="systemTimeBeanDefinitionParserTest_pure_prefix_suffix" prefix="Hello" suffix="World"/>
+
+    <test:date id="dateBeanDefinitionParserTest" buffer="+20d5h"/>
+
+    <test:env id="envValueBeanDefinitionParserTest" sit="sit_abc" dev="dev_abc" />
+
+    <test:systemTime id="singletonTimeTest" singleton="true"/>
+
+    <test:strVlt id="strVlt" property="abc" expect="bcd" method="Contains" fetchMode="ByContext"/>
+
+    <test:repeat id="repeatTest" length="512" template="abc"/>
+
+    <test:repeat id="repeatTest2" length="512">
+        <test:systemTime prefix="自动化创建测试"/>
+    </test:repeat>
+
+    <test:repeat id="repeatTest3" length="256">
+        <bean class="java.lang.String">
+            <constructor-arg value="Hello"/>
+        </bean>
+    </test:repeat>
+
+
+</beans>

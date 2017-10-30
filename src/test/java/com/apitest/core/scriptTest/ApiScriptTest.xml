@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="flowTest_001" class="com.apitest.core.scriptTest.TestFlowData">
+        <property name="preApiScript">
+            <bean class="com.apitest.core.ApiScript">
+                <constructor-arg value="com.apitest.core.scriptTest.PreFlowTest"></constructor-arg>
+                <constructor-arg value="preFlow1"/>
+            </bean>
+        </property>
+        <property name="name" value="@name"/>
+    </bean>
+
+    <bean id="flowTest_002" class="com.apitest.core.scriptTest.TestFlowData">
+        <property name="preApiScript">
+            <bean class="com.apitest.core.ApiScript">
+                <constructor-arg value="com.apitest.core.scriptTest.PreFlowTest"/>
+                <constructor-arg value="preFlow2"/>
+                <property name="properties">
+                    <map>
+                        <entry key="age" value="18"/>
+                    </map>
+                </property>
+            </bean>
+        </property>
+        <property name="name" value="@age"/>
+    </bean>
+
+
+</beans>

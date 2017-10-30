@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.apitest.com/schema/apiTest"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:beans="http://www.springframework.org/schema/beans"
+            targetNamespace="http://www.apitest.com/schema/apiTest"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.springframework.org/schema/beans"/>
+
+
+    <xsd:attributeGroup name="validatorProperty">
+        <xsd:attribute name="property" type="xsd:string"/>
+        <xsd:attribute name="expect" type="xsd:string"/>
+        <xsd:attribute name="fetchMode" default="ByValue">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="ByContext"/>
+                    <xsd:enumeration value="ByValue"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+    </xsd:attributeGroup>
+
+    <xsd:complexType name="baseValidator">
+        <xsd:complexContent>
+            <xsd:extension base="beans:identifiedType">
+                <xsd:attributeGroup ref="validatorProperty"/>
+                <xsd:attribute name="parent" type="xsd:string"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="strVlt">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="baseValidator">
+                    <xsd:attribute name="method" default="Regex">
+                        <xsd:simpleType>
+                            <xsd:restriction base="xsd:string">
+                                <xsd:enumeration value="Regex"/>
+                                <xsd:enumeration value="Contains"/>
+                                <xsd:enumeration value="Equals"/>
+                                <xsd:enumeration value="NotEquals"/>
+                                <xsd:enumeration value="ContainsWithCaseInsensitive"/>
+                                <xsd:enumeration value="EqualsWithCaseInsensitive"/>
+                                <xsd:enumeration value="NotEqualsWithCaseInsensitive"/>
+                            </xsd:restriction>
+                        </xsd:simpleType>
+                    </xsd:attribute>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="env">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="beans:identifiedType">
+                    <xsd:attribute name="sit" type="xsd:string"/>
+                    <xsd:attribute name="dev" type="xsd:string"/>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="date">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="beans:identifiedType">
+                    <xsd:attribute name="buffer">
+                        <xsd:simpleType>
+                            <xsd:restriction base="xsd:string">
+                                <xsd:pattern value=".([1-9][0-9]*[ydhms]){0,5}"/>
+                            </xsd:restriction>
+                        </xsd:simpleType>
+                    </xsd:attribute>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+
+    <xsd:complexType name="factoryBean">
+        <xsd:complexContent>
+            <xsd:extension base="beans:identifiedType">
+                <xsd:attribute name="singleton" default="false" type="xsd:boolean"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+
+    <xsd:element name="systemTime">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="factoryBean">
+                    <xsd:attribute name="prefix" type="xsd:string"/>
+                    <xsd:attribute name="suffix" type="xsd:string"/>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="repeat">
+
+        <xsd:complexType>
+            <xsd:complexContent>
+
+                <xsd:extension base="factoryBean">
+                    <xsd:group ref="any" minOccurs="0" maxOccurs="1"/>
+                    <xsd:attributeGroup ref="repeat_Attribute"/>
+                </xsd:extension>
+
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:group name="any">
+        <xsd:sequence>
+            <xsd:any/>
+        </xsd:sequence>
+    </xsd:group>
+
+    <xsd:attributeGroup name="repeat_Attribute">
+        <xsd:attribute name="length" type="xsd:integer"/>
+        <xsd:attribute name="template" type="xsd:string"/>
+    </xsd:attributeGroup>
+</xsd:schema>

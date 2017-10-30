@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="preFlow1" class="com.apitest.core.scriptTest.TestFlowData">
+        <property name="name" value="preFlowName"/>
+    </bean>
+
+    <bean id="preFlow2" class="com.apitest.core.scriptTest.PreFlowData">
+        <property name="age" value="17"/>
+    </bean>
+</beans>

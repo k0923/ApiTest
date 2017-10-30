@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:test="http://www.apitest.com/schema/apiTest"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.apitest.com/schema/apiTest http://www.apitest.com/schema/apiTest/apiTest.xsd">
+
+    <bean id="mytestStudent" class="com.apitest.testModels.StudentModel" scope="prototype">
+        <property name="name" value="Young"/>
+        <property name="age" value="18"/>
+        <property name="man" value="true"/>
+        <property name="money">
+            <test:systemTime/>
+        </property>
+    </bean>
+</beans>

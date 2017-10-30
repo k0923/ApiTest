@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:test="http://www.apitest.com/schema/apiTest"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.apitest.com/schema/apiTest http://www.apitest.com/schema/apiTest/apiTest.xsd">
+
+    <bean id="test" class="com.apitest.core.lifeCycleTest.LifeCycleTestData" scope="prototype">
+        <property name="name">
+            <test:env sit="WWWW" dev="WWW"/>
+        </property>
+    </bean>
+</beans>
