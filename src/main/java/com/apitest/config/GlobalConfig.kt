@@ -18,7 +18,7 @@ object GlobalConfig {
 
     private val envConfigPath = "apitestconfig/env.properties"
 
-    private val globalConfigPath = "apitestconfig/sample.xml"
+    private val globalConfigPath = "apitestconfig/globalConfig.xml"
 
     private val lazyConfigPath = "apitestconfig/lazyConfig.xml"
 
