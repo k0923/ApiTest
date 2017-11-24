@@ -15,25 +15,32 @@ import java.lang.reflect.Constructor
 import java.lang.reflect.Method
 
 class ApiTestListener: IHookable, IAnnotationTransformer2, ISuiteListener,IClassListener{
+
+    companion object {
+        val dataSet:MutableSet<Any?> = HashSet()
+    }
+
     override fun onBeforeClass(testClass: ITestClass?) {
         testClass?.realClass?.getAnnotation(Component::class.java)?.let {
             testClass.getInstances(false)?.forEach { obj->
-                testClass.realClass.declaredFields.forEach { f->
-                    f.getAnnotation(Autowired::class.java)?.let {
-                        val context = SpringUtils.getContext(testClass.realClass)
-                        when(context!!.containsBean(f.name)){
-                            true->{
-                                f.isAccessible = true
-                                f.set(obj,context.getBean(f.name,f.type))
-                            }
-                            else->{
-                                if(it.required){
-                                    throw NoSuchBeanDefinitionException(testClass.realClass,f.name,"No such Bean found")
+                if(!dataSet.contains(obj)){
+                    dataSet.add(obj)
+                    testClass.realClass.declaredFields.forEach { f->
+                        f.getAnnotation(Autowired::class.java)?.let {
+                            val context = SpringUtils.getContext(testClass.realClass)
+                            when(context!!.containsBean(f.name)){
+                                true->{
+                                    f.isAccessible = true
+                                    f.set(obj,context.getBean(f.name,f.type))
+                                }
+                                else->{
+                                    if(it.required){
+                                        throw NoSuchBeanDefinitionException(testClass.realClass,f.name,"No such Bean found")
+                                    }
                                 }
                             }
                         }
                     }
-
                 }
             }
         }
@@ -125,6 +132,7 @@ class ApiTestListener: IHookable, IAnnotationTransformer2, ISuiteListener,IClass
 
     override fun onFinish(suite: ISuite?) {
         SpringUtils.clearAll()
+        dataSet.clear()
     }
 
     override fun onStart(suite: ISuite?) {
