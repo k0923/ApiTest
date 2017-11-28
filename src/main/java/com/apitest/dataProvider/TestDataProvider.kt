@@ -8,13 +8,11 @@ class TestDataProvider {
 
     @DataProvider
     fun getData(method: Method):Array<Array<Any?>>{
-        var data = ScriptUtils.getTestData(method)
+        val data = ScriptUtils.getTestData(method)
         return Array(data.size){ index->Array(1){data[index]}}
     }
 
     @DataProvider(parallel = true)
-    fun getDataParallel(method: Method):Array<Array<Any?>>{
-        return getData(method)
-    }
+    fun getDataParallel(method: Method):Array<Array<Any?>> = getData(method)
 
 }

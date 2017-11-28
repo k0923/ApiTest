@@ -82,17 +82,17 @@ class ApiTestListener: IHookable, IAnnotationTransformer2, ISuiteListener,IClass
     }
 
     override fun transform(annotation: ITestAnnotation?, testClass: Class<*>?, testConstructor: Constructor<*>?, method: Method?) {
-        if(method?.parameterTypes?.size == 1){
-            if(annotation?.dataProvider?.isEmpty() == true){
-                val testDataConfig = ScriptUtils.getTestDataConfig(method)
-                annotation.dataProviderClass = TestDataProvider::class.java
-                annotation.dataProvider = if(testDataConfig.parallel) "getDataParallel" else "getData"
 
-
-
-
-
-
+        method?.parameters?.let {
+            if (it.isNotEmpty()) {
+                if (annotation?.dataProvider?.isEmpty() == true) {
+                    val testDataConfig = ScriptUtils.getTestDataConfig(method)
+                    annotation.dataProviderClass = TestDataProvider::class.java
+                    annotation.dataProvider = if (testDataConfig.parallel) "getDataParallel" else "getData"
+                }
+            }
+        }
+//todo testng这边有个BUG，已经反馈给testng团队了，等修复完才能用，否则没屌用
 //                var provider = DataSource.Spring
 //                var testData = method.getAnnotation(TestData::class.java)
 //                if(testData!=null){
@@ -101,8 +101,7 @@ class ApiTestListener: IHookable, IAnnotationTransformer2, ISuiteListener,IClass
 //                var config = provider.getConfig()
 //                annotation.dataProviderClass = config.first
 //                annotation.dataProvider = config.second
-            }
-        }
+
 //        val set = HashSet<String>()
 //        annotation?.dependsOnMethods?.let {
 //            it.forEach {

@@ -1,20 +1,19 @@
 package com.apitest.spring.extension
 
 import com.apitest.config.Environment
-import com.apitest.spring.factoryBeans.SystemTimeFactoryBean
 import com.apitest.spring.factoryBeans.EnvValueFactoryBean
 import com.apitest.spring.factoryBeans.RepeatFactoryBean
 import com.apitest.spring.factoryBeans.StringValidatorFactoryBean
+import com.apitest.spring.factoryBeans.SystemTimeFactoryBean
 import com.apitest.utils.DateUtils
-import org.springframework.beans.factory.config.BeanDefinitionHolder
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport
 import org.springframework.beans.factory.xml.ParserContext
 import org.w3c.dom.Element
-import java.lang.reflect.Constructor
 import java.util.*
 import kotlin.collections.HashMap
+
 
 class ApiTestNamespaceHandler:NamespaceHandlerSupport(){
 
@@ -38,7 +37,7 @@ class ApiTestNamespaceHandler:NamespaceHandlerSupport(){
             if(element!=null && builder !=null){
                 propNames?.forEach{
                     if(element.hasAttribute(it)){
-                        var property = element.getAttribute(it)
+                        val property = element.getAttribute(it)
                         builder.addPropertyValue(it,property)
                     }
                 }
@@ -63,9 +62,7 @@ class ApiTestNamespaceHandler:NamespaceHandlerSupport(){
 
         private val propList = arrayListOf("prefix","suffix","singleton")
 
-        override fun getBeanClass(element: Element?): Class<*> {
-            return SystemTimeFactoryBean::class.java
-        }
+        override fun getBeanClass(element: Element?): Class<*> = SystemTimeFactoryBean::class.java
 
         override fun doParse(element: Element?, builder: BeanDefinitionBuilder?) {
             ApiTestNamespaceHandler.setGenericBean(builder,element,propList)
@@ -74,9 +71,7 @@ class ApiTestNamespaceHandler:NamespaceHandlerSupport(){
     }
 
     inner class DateBeanDefinitionParser:AbstractSingleBeanDefinitionParser(){
-        override fun getBeanClass(element: Element?): Class<*> {
-            return Date::class.java
-        }
+        override fun getBeanClass(element: Element?): Class<*> = Date::class.java
 
         override fun doParse(element: Element, builder: BeanDefinitionBuilder) {
             var buffer = element!!.getAttribute("buffer")
@@ -93,9 +88,7 @@ class ApiTestNamespaceHandler:NamespaceHandlerSupport(){
 
         private val propList = arrayListOf("template","length","singleton")
 
-        override fun getBeanClass(element: Element?): Class<*> {
-            return RepeatFactoryBean::class.java
-        }
+        override fun getBeanClass(element: Element?): Class<*> = RepeatFactoryBean::class.java
 
         override fun doParse(element: Element?,parserContext: ParserContext, builder: BeanDefinitionBuilder) {
             setGenericBean(builder,element,propList)
@@ -104,20 +97,12 @@ class ApiTestNamespaceHandler:NamespaceHandlerSupport(){
                 0-> setGenericBean(builder,element, arrayListOf("template"))
                 else->builder.addPropertyValue("template",list[0])
             }
-
-
-
-
-
-
         }
     }
 
     inner class EnvValueBeanDefinitionParser:AbstractSingleBeanDefinitionParser(){
 
-        override fun getBeanClass(element: Element?): Class<*> {
-            return EnvValueFactoryBean::class.java
-        }
+        override fun getBeanClass(element: Element?): Class<*> = EnvValueFactoryBean::class.java
 
         override fun doParse(element: Element, builder: BeanDefinitionBuilder) {
 
@@ -135,9 +120,7 @@ class ApiTestNamespaceHandler:NamespaceHandlerSupport(){
 
         private val propList = arrayListOf("property","expect","method","fetchMode")
 
-        override fun getBeanClass(element: Element?): Class<*> {
-            return StringValidatorFactoryBean::class.java
-        }
+        override fun getBeanClass(element: Element?): Class<*> = StringValidatorFactoryBean::class.java
 
         override fun doParse(element: Element?, parserContext: ParserContext?, builder: BeanDefinitionBuilder?) {
             setGenericBean(builder,element,propList)

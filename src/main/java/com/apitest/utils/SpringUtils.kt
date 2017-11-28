@@ -1,23 +1,26 @@
 package com.apitest.utils
 
 import com.apitest.core.ITestData
-import com.apitest.dataProvider.TestData
 import com.apitest.dataProvider.TestDataConfig
 import com.apitest.extensions.ofType
 import com.apitest.spring.beanConfig.ApiBaseDataBeanConfigProcessor
 import com.apitest.spring.beanConfig.ApiBatchDataBeanConfigProcessor
 import com.apitest.spring.common.BatchData
+import com.apitest.utils.PathUtils.getClassFolder
+import com.apitest.utils.PathUtils.getResourceFile
 import org.apache.logging.log4j.LogManager
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader
+import org.springframework.context.ApplicationContext
 import org.springframework.context.support.AbstractApplicationContext
 import org.springframework.context.support.StaticApplicationContext
 import org.springframework.core.io.FileSystemResource
 import org.springframework.core.io.Resource
 import java.lang.reflect.Executable
+import java.lang.reflect.Parameter
 import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.Pattern
-import com.apitest.utils.PathUtils.getResourceFile
-import com.apitest.utils.PathUtils.getClassFolder
+import javax.annotation.Nullable
 
 object SpringUtils{
 
@@ -30,9 +33,7 @@ object SpringUtils{
         return getContext(file)
     }
 
-    fun getContext(file:String): AbstractApplicationContext? {
-        return getContext(FileSystemResource(file))
-    }
+    fun getContext(file:String): AbstractApplicationContext? = getContext(FileSystemResource(file))
 
     fun getContext(resource:Resource):AbstractApplicationContext?{
         if(contextCache.containsKey(resource.file.absolutePath)){
@@ -71,12 +72,45 @@ object SpringUtils{
         contextCache.clear()
     }
 
+    fun getDataV2(method:Executable,testDataConfig: TestDataConfig):List<Any>?{
+        val params = method.parameters
+        if(params.isEmpty()){
+            throw IllegalArgumentException("No parameter found in method:$method")
+        }
+        val ctx = if(testDataConfig.file.isBlank()){
+            getContext(method.declaringClass)
+        }else{
+            getContext("${method.declaringClass.getClassFolder()}/${testDataConfig.file}")
+        }
+        val dataList = arrayOfNulls<Array<out Any?>>(params.size)
+        var i = 0
+        params.forEach {
+            dataList[i++] = getData(it,ctx!!)?.toTypedArray()
+        }
+        val result = CommonUtils.getCartesianProductByArray(dataList)
+        return result.toList()
+    }
+
+
+    private fun getData(para:Parameter,ctx:ApplicationContext):List<Any>?{
+        val nullable = para.getAnnotation(Nullable::class.java)
+        if(nullable!=null)
+            return null
+        val paraType = para.type
+        val qualifier = para.getAnnotation(Qualifier::class.java)
+        return when(qualifier){
+            null -> ctx.getBeansOfType(paraType).map { it.value }
+            else -> ctx.getBeansOfType(paraType).filter { Pattern.matches(qualifier.value,it.key) }.map { it.value }.toList()
+        }
+    }
+
+
     fun getData(method: Executable,testDataConfig:TestDataConfig):List<Any?>{
         val paraClasses = method.parameterTypes
         if(paraClasses.size!=1){
             throw IllegalArgumentException("Only 1 parameter allowed in method:$method")
         }
-        var ctx = if(testDataConfig.file.isBlank()){
+        val ctx = if(testDataConfig.file.isBlank()){
             getContext(method.declaringClass)
         }else{
             getContext("${method.declaringClass.getClassFolder()}/${testDataConfig.file}")
@@ -93,7 +127,6 @@ object SpringUtils{
                     }else{
                         listOf(data)
                     }
-
                 }
                 false->{
                     var mappedDatas = ctx?.getBeansOfType(paraClasses[0])

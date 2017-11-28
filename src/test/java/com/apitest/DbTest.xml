@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:test="http://www.apitest.com/schema/apiTest"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.apitest.com/schema/apiTest http://www.apitest.com/schema/apiTest/apiTest.xsd">
+
+    <bean id="o1" class="java.lang.String">
+        <constructor-arg value="20160723001040010100680000000001"/>
+    </bean>
+    <!--<bean id="o2" class="java.lang.String">-->
+    <!--<constructor-arg value="20171012111040030100590300000002"/>-->
+    <!--</bean>-->
+    <!--<bean id="o3" class="java.lang.String">-->
+    <!--<constructor-arg value="20171012111040030100590200000002"/>-->
+    <!--</bean>-->
+
+</beans>

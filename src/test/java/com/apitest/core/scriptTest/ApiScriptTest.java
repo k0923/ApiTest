@@ -9,6 +9,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 
 public class ApiScriptTest {
 
@@ -20,14 +21,21 @@ public class ApiScriptTest {
     }
 
     @Test
-    public void flowTest_001(TestFlowData data){
-        Assert.assertNotNull(data.getName());
-        Assert.assertNotEquals(data.getName(),"@name");
+    public void flowTest_001(TestFlowData data123){
+        Assert.assertNotNull(data123.getName());
+        Assert.assertNotEquals(data123.getName(),"@name");
     }
 
     @Test
     public void flowTest_002(TestFlowData data){
         Assert.assertEquals(data.getName(),"18");
+    }
+
+    @Test
+    public void fT_003() throws NoSuchMethodException {
+       Method method = ApiScriptTest.class.getDeclaredMethod("flowTest_001", TestFlowData.class);
+        Parameter p1 = method.getParameters()[0];
+
     }
 
 }

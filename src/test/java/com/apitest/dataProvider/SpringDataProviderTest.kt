@@ -1,8 +1,13 @@
 package com.apitest.dataProvider
 
 import com.apitest.common.TestMethodLocal
+import com.apitest.utils.ScriptUtils
+import com.apitest.utils.SpringUtils
+import org.springframework.beans.factory.annotation.Qualifier
 import org.testng.Assert
 import org.testng.annotations.Test
+import javax.annotation.Nullable
+import kotlin.reflect.jvm.javaMethod
 
 class SpringDataProviderTest{
 
@@ -46,6 +51,25 @@ class SpringDataProviderTest{
     @TestData(single = false)
     fun getSystemData(d:Long){
         println(d)
+    }
+//    ----------------
+    @Test
+    fun test(){
+        val m = this::myFun.javaMethod
+
+        val config = ScriptUtils.getTestDataConfig(m!!)
+        val result = SpringUtils.getDataV2(m,config)
+
+    }
+
+    @Test
+    fun myFun(data1:String,@Qualifier(".+Test.+")data2:String,@Nullable data3:String){
+
+    }
+
+    @Test
+    fun myFun1(@Qualifier data1:String){
+
     }
 
 
