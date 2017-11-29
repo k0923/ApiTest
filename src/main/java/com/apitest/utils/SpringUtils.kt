@@ -45,8 +45,8 @@ object SpringUtils{
 
     @Synchronized
     private fun getContext(defaultBeans:Map<String,Class<*>>?,vararg resources: Resource): AbstractApplicationContext {
-        var ctx = StaticApplicationContext()
-        var xdr = XmlBeanDefinitionReader(ctx)
+        val ctx = StaticApplicationContext()
+        val xdr = XmlBeanDefinitionReader(ctx)
         defaultBeans?.forEach { ctx.registerSingleton(it.key,it.value) }
         if(resources.isNotEmpty()){
             resources.forEach { xdr.loadBeanDefinitions(it) }
@@ -72,30 +72,18 @@ object SpringUtils{
         contextCache.clear()
     }
 
-    fun getDataV2(method:Executable,testDataConfig: TestDataConfig):List<Any>?{
-        val params = method.parameters
-        if(params.isEmpty()){
-            throw IllegalArgumentException("No parameter found in method:$method")
-        }
-        val ctx = if(testDataConfig.file.isBlank()){
-            getContext(method.declaringClass)
-        }else{
-            getContext("${method.declaringClass.getClassFolder()}/${testDataConfig.file}")
-        }
-        val dataList = arrayOfNulls<Array<out Any?>>(params.size)
+
+    private fun getData(paras:Array<Parameter>, ctx:ApplicationContext):List<Any?>{
+        val dataList = arrayOfNulls<Array<out Any?>>(paras.size)
         var i = 0
-        params.forEach {
-            dataList[i++] = getData(it,ctx!!)?.toTypedArray()
+        paras.forEach {
+            dataList[i++] = getData(it,ctx).toTypedArray()
         }
         val result = CommonUtils.getCartesianProductByArray(dataList)
         return result.toList()
     }
 
-
-    private fun getData(para:Parameter,ctx:ApplicationContext):List<Any>?{
-        val nullable = para.getAnnotation(Nullable::class.java)
-        if(nullable!=null)
-            return null
+    private fun getData(para:Parameter,ctx:ApplicationContext):List<Any?>{
         val paraType = para.type
         val qualifier = para.getAnnotation(Qualifier::class.java)
         return when(qualifier){
@@ -104,45 +92,89 @@ object SpringUtils{
         }
     }
 
-
-    fun getData(method: Executable,testDataConfig:TestDataConfig):List<Any?>{
-        val paraClasses = method.parameterTypes
-        if(paraClasses.size!=1){
-            throw IllegalArgumentException("Only 1 parameter allowed in method:$method")
-        }
-        val ctx = if(testDataConfig.file.isBlank()){
-            getContext(method.declaringClass)
-        }else{
-            getContext("${method.declaringClass.getClassFolder()}/${testDataConfig.file}")
-        }
-        //由于构造函数的name是全路径
-        var name = method.name.split(".").last()
-        return with(testDataConfig){
-            when(single){
-                true->{
-                    val data = ctx?.getBean(name)
-                    data?.ofType(ITestData::class.java)?.let {it.id = name}
-                    if(data is BatchData){
-                        data.data
-                    }else{
-                        listOf(data)
-                    }
+    private fun getData(method: Executable,para:Parameter, ctx:ApplicationContext):List<Any?>{
+        val name = method.name.split(".").last()
+        val qualifier = para.getAnnotation(Qualifier::class.java)
+        val single = qualifier == null
+        return when(single){
+            true->{
+                val data = ctx.getBean(name)
+                if(data is BatchData){
+                    data.data
+                }else{
+                    listOf(data)
                 }
-                false->{
-                    var mappedDatas = ctx?.getBeansOfType(paraClasses[0])
-                    if(pattern.isNotEmpty()){
-                        mappedDatas = mappedDatas?.filter {
-                            Pattern.matches(pattern,it.key)
-                        }
-                    }
-                    val list = ArrayList<Any?>()
-                    mappedDatas?.forEach { k, v ->
-                        list.add(v)
-                        v.ofType(ITestData::class.java)?.let{it.id = k}
-                    }
-                    list
-                }
+            }
+            false->{
+                ctx.getBeansOfType(para.type).filter { Pattern.matches(qualifier.value,it.key) }.map { it.value }
             }
         }
     }
+
+    private fun getContext(cls:Class<*>,testDataConfig:TestDataConfig):ApplicationContext {
+        return if(testDataConfig.file.isBlank()){
+            getContext(cls)
+        }else{
+            getContext("${cls.getClassFolder()}/${testDataConfig.file}")
+        } ?: throw NullPointerException("No context found")
+    }
+
+    fun getData(para:Parameter,testDataConfig:TestDataConfig):List<Any?>{
+        val ctx = getContext(para.declaringExecutable.declaringClass,testDataConfig)
+        return getData(para,ctx)
+    }
+
+    fun getData(method:Executable,testDataConfig: TestDataConfig):List<Any?>{
+        val params = method.parameters
+        val ctx = getContext(method.declaringClass,testDataConfig)
+        return when(params.size){
+            1-> getData(method,params[0],ctx)
+            else->getData(params,ctx)
+        }
+    }
+
+
+
+
+
+//    fun getData(method: Executable,testDataConfig:TestDataConfig):List<Any?>{
+//        val paraClasses = method.parameterTypes
+//        if(paraClasses.size!=1){
+//            throw IllegalArgumentException("Only 1 parameter allowed in method:$method")
+//        }
+//        val ctx = if(testDataConfig.file.isBlank()){
+//            getContext(method.declaringClass)
+//        }else{
+//            getContext("${method.declaringClass.getClassFolder()}/${testDataConfig.file}")
+//        }
+//        //由于构造函数的name是全路径
+//        val name = method.name.split(".").last()
+//        return with(testDataConfig){
+//            when(single){
+//                true->{
+//                    val data = ctx?.getBean(name)
+//                    data?.ofType(ITestData::class.java)?.let {it.id = name}
+//                    if(data is BatchData){
+//                        data.data
+//                    }else{
+//                        listOf(data)
+//                    }
+//                }
+//                false->{
+//                    var mappedDatas = ctx?.getBeansOfType(paraClasses[0])
+//                    if(pattern.isNotEmpty()){
+//                        mappedDatas = mappedDatas?.filter {
+//                            Pattern.matches(pattern,it.key)
+//                        }
+//                    }
+//                    val list = ArrayList<Any?>()
+//                    mappedDatas?.forEach { k, v ->
+//                        list.add(v)
+//                        v.ofType(ITestData::class.java)?.let{it.id = k}
+//                    }
+//                    list
+//                }
+//            }
+//        }
+//    }
 }

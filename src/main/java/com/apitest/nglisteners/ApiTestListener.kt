@@ -86,9 +86,10 @@ class ApiTestListener: IHookable, IAnnotationTransformer2, ISuiteListener,IClass
         method?.parameters?.let {
             if (it.isNotEmpty()) {
                 if (annotation?.dataProvider?.isEmpty() == true) {
-                    val testDataConfig = ScriptUtils.getTestDataConfig(method)
+                    val testDataConfigs = ScriptUtils.getTestDataConfig(method)
                     annotation.dataProviderClass = TestDataProvider::class.java
-                    annotation.dataProvider = if (testDataConfig.parallel) "getDataParallel" else "getData"
+                    annotation.dataProvider = if(testDataConfigs.any { it.parallel==false }) "getData" else "getDataParallel"
+                            //if (testDataConfig.parallel) "getDataParallel" else "getData"
                 }
             }
         }

@@ -33,7 +33,7 @@ object GlobalConfig {
     private var retryCount:Int =0
 
     init {
-        var envConfigResource = ClassPathResource(envConfigPath)
+        val envConfigResource = ClassPathResource(envConfigPath)
 
         if(envConfigResource.exists()){
             val props = Properties()
@@ -48,7 +48,7 @@ object GlobalConfig {
             }
         }
 
-        var contextResource = ClassPathResource(globalConfigPath)
+        val contextResource = ClassPathResource(globalConfigPath)
         if(contextResource.exists()){
             ctx = SpringUtils.getContext(contextResource)
         }

@@ -57,8 +57,8 @@ class SpringDataProviderTest{
     fun test(){
         val m = this::myFun.javaMethod
 
-        val config = ScriptUtils.getTestDataConfig(m!!)
-        val result = SpringUtils.getDataV2(m,config)
+        val config = ScriptUtils.getTestDataConfig(m!!)[0]
+        val result = SpringUtils.getData(m,config)
 
     }
 
@@ -71,6 +71,13 @@ class SpringDataProviderTest{
     fun myFun1(@Qualifier data1:String){
 
     }
+
+    @Test
+    fun myFun2(data1:String,@Qualifier data2:String?){
+
+    }
+
+
 
 
 

@@ -21,11 +21,11 @@ object ScriptUtils {
     private val logger = LogManager.getLogger(SpringUtils::class.java)
 
     fun <T> getTestData(cls: Class<*>, methodName: String, dataCls: Class<*>, filter: (T) -> Boolean): T? {
-        var method = cls.getMethod(methodName, dataCls)
+        val method = cls.getMethod(methodName, dataCls)
         if (method != null) {
-            var datas = getTestData(method)
+            val datas = getTestData(method)
             return datas.first {
-                var data = it as T
+                val data = it as T
                 if (data != null) {
                     filter(data)
                 } else
@@ -37,24 +37,46 @@ object ScriptUtils {
 
 
     fun getTestData(method: Executable): List<Any?> {
-        val testDataConfig = getTestDataConfig(method)
-        return testDataConfig.source.dataMethod(method,testDataConfig)
+        val testDataConfigs = getTestDataConfig(method)
+
+
+        return when(testDataConfigs.size){
+            1->testDataConfigs[0].source.dataFromMethod(method,testDataConfigs[0])
+            else-> {
+                if(testDataConfigs.size!=method.parameterCount){
+                    throw RuntimeException("The number of TestData is not equal to the number of Parameter")
+                }
+                val data = arrayOfNulls<Array<out Any?>>(method.parameterCount)
+                method.parameters.indices.forEach {
+                    data[it] = testDataConfigs[it].source.dataFromPara(method.parameters[it],testDataConfigs[it]).toTypedArray()
+                }
+                CommonUtils.getCartesianProductByArray(data).toList()
+            }
+        }
     }
 
-    fun getTestDataConfig(method:Executable):TestDataConfig{
+
+    fun getTestDataConfig(data:TestData?):TestDataConfig{
         val testDataConfig = TestDataConfig()
-        val testData = method.getAnnotation(TestData::class.java)
-        if (testData != null) {
+        if (data != null) {
             with(testDataConfig) {
-                single = testData.single
-                pattern = testData.pattern
-                file = testData.file
-                source = testData.source
-                dataProvider = testData.dataProvider
-                parallel = testData.parallel
+                single = data.single
+                pattern = data.pattern
+                file = data.file
+                source = data.source
+                dataProvider = data.dataProvider
+                parallel = data.parallel
             }
         }
         return testDataConfig
+    }
+
+    fun getTestDataConfig(method:Executable):Array<TestDataConfig>{
+        val testDatas = method.getAnnotationsByType(TestData::class.java)
+        return when(testDatas.size){
+            0-> arrayOf(getTestDataConfig(null))
+            else->testDatas.map { getTestDataConfig(it) }.toTypedArray()
+        }
     }
 
 //    fun getTestDataConfig(testData: TestData?): TestDataConfig {
@@ -86,7 +108,7 @@ object ScriptUtils {
             var result: Any? = null
             try {
                 flowData?.let { fd -> data?.ofType(ApiBaseData::class.java)?.let { ScriptUtils.configFlowData(it, fd) } }
-                data?.ofType(IDataLifeCycle::class.java)?.let { it.beforeRun() }
+                data?.ofType(IDataLifeCycle::class.java)?.beforeRun()
                 when (runMethod) {
                     null -> {
                         result = when (data) {
@@ -98,10 +120,10 @@ object ScriptUtils {
                         runMethod()
                     }
                 }
-                data?.ofType(IDataLifeCycle::class.java)?.let { it.afterRun() }
+                data?.ofType(IDataLifeCycle::class.java)?.afterRun()
                 flowData?.let { fd -> data?.let { ScriptUtils.addFlowData(it, fd) } }
             } finally {
-                data?.ofType(IDataLifeCycle::class.java)?.let { it.finalRun() }
+                data?.ofType(IDataLifeCycle::class.java)?.finalRun()
             }
             result
         }
