@@ -1,9 +1,7 @@
 package com.apitest
 
 import com.apitest.config.GlobalConfig
-import com.apitest.dataProvider.TestData
 import org.apache.ibatis.annotations.Select
-import org.testng.annotations.Test
 
 class DbTest {
 

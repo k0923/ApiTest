@@ -1,14 +1,12 @@
 package com.apitest.utils
 
-import com.apitest.core.ITestData
-import com.apitest.dataProvider.TestData
 import com.apitest.dataProvider.TestDataConfig
 import com.apitest.utils.PathUtils.getClassFolder
 import java.io.File
 import java.io.BufferedReader
 import java.io.FileReader
 import java.lang.reflect.Executable
-import java.lang.reflect.Method
+import java.lang.reflect.Parameter
 import java.util.function.Consumer
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
@@ -53,33 +51,26 @@ object FileReaderUtils {
     }
 
 
-    fun read(method: Executable,testDataConfig:TestDataConfig):List<Any?>{
+    private fun getFile(cls:Class<*>,testDataConfig:TestDataConfig):File{
+        val filePath = if(testDataConfig.file.isBlank()){
+            "${cls.getClassFolder()}/${cls.simpleName}.csv"
+        }else {"${cls.getClassFolder()}/${testDataConfig.file}"}
+        return File(filePath)
+    }
+
+    fun read(para:Parameter,testDataConfig:TestDataConfig):List<Any?>{
+        val file = getFile(para.declaringExecutable.declaringClass,testDataConfig)
+        return read(file,para.type.kotlin)
+    }
+
+    fun read(method: Executable,testDataConfig:TestDataConfig):Array<Array<Any?>>{
         val paraClasses = method.parameterTypes
         if(paraClasses.size!=1){
             throw IllegalArgumentException("Only 1 parameter allowed in method:$method")
         }
-        var filePath = if(testDataConfig.file.isBlank()){
-            "${method.declaringClass.getClassFolder()}/${method.declaringClass.simpleName}.csv"
-        }else {"${method.declaringClass.getClassFolder()}/${testDataConfig.file}"}
-        var data = read(File(filePath),method.parameterTypes[0].kotlin)
-        return with(testDataConfig){
-            when(single){
-                true->{
-                    if(method.parameterTypes[0] is ITestData){
-                        listOf(data.first { (it as ITestData).id == method.name })
-                    }else{
-                        listOf(data.first())
-                    }
-                }
-                else->{
-                    if(method.parameterTypes[0] is ITestData){
-                        data.filter { (it as ITestData).id == method.name }.toList()
-                    }else{
-                        data
-                    }
-                }
-            }
-        }
+        val file = getFile(method.declaringClass,testDataConfig)
+        val data = read(file,method.parameterTypes[0].kotlin)
+        return Array(data.size,{i-> arrayOf(data[i])})
     }
 
 

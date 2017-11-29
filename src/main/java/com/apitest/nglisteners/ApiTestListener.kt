@@ -2,7 +2,6 @@ package com.apitest.nglisteners
 
 import com.apitest.core.ApiBaseData
 import com.apitest.core.IDataLifeCycle
-import com.apitest.dataProvider.FactoryDataProvider
 import com.apitest.dataProvider.TestDataProvider
 import com.apitest.utils.ScriptUtils
 import com.apitest.utils.SpringUtils
@@ -76,8 +75,8 @@ class ApiTestListener: IHookable, IAnnotationTransformer2, ISuiteListener,IClass
             return
         }
         if(method==null){
-            annotation.dataProvider = "getData"
-            annotation.dataProviderClass = FactoryDataProvider::class.java
+            annotation.dataProvider = "getConstructorData"
+            annotation.dataProviderClass = TestDataProvider::class.java
         }
     }
 

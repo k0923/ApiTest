@@ -1,12 +1,8 @@
 package com.apitest.spring.extension;
 
-import com.apitest.core.ApiBaseData;
-import com.apitest.core.ITestData;
 import com.apitest.core.ITestScript;
-import com.apitest.dataProvider.IDataProvider;
-import com.apitest.dataProvider.TestData;
+import com.apitest.annotations.TestData;
 import com.apitest.spring.factoryBeans.StringValidatorFactoryBean;
-import com.apitest.utils.ScriptUtils;
 import com.apitest.validations.FetchMode;
 import com.apitest.validations.StrVltMethod;
 import com.apitest.validations.StringValidator;

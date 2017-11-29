@@ -1,5 +1,6 @@
 package com.apitest.dataProvider;
 
+import com.apitest.annotations.TestData;
 import org.testng.Assert;
 import org.testng.annotations.Factory;
 import org.testng.annotations.Test;

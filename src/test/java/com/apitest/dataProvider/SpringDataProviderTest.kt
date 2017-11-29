@@ -1,5 +1,6 @@
 package com.apitest.dataProvider
 
+import com.apitest.annotations.TestData
 import com.apitest.common.TestMethodLocal
 import com.apitest.utils.ScriptUtils
 import com.apitest.utils.SpringUtils

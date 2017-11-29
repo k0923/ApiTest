@@ -4,7 +4,7 @@ import java.lang.reflect.Executable
 import kotlin.reflect.full.createInstance
 
 object CustomDataUtils{
-    fun getData(method: Executable, testDataConfig: TestDataConfig):List<Any?>{
+    fun getData(method: Executable, testDataConfig: TestDataConfig):Array<Array<Any?>>{
         val paraClasses = method.parameterTypes
         if(paraClasses.size!=1){
             throw IllegalArgumentException("Only 1 parameter allowed in method:$method")
@@ -16,6 +16,6 @@ object CustomDataUtils{
 
 
         val dataProvider = testDataConfig.dataProvider.createInstance()
-        return dataProvider.getData(method,testDataConfig)
+        return dataProvider.getData(method,testDataConfig).map { arrayOf(it) }.toTypedArray()
     }
 }

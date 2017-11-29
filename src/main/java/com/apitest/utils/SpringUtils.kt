@@ -73,14 +73,13 @@ object SpringUtils{
     }
 
 
-    private fun getData(paras:Array<Parameter>, ctx:ApplicationContext):List<Any?>{
+    private fun getData(paras:Array<Parameter>, ctx:ApplicationContext):Array<Array<Any?>>{
         val dataList = arrayOfNulls<Array<out Any?>>(paras.size)
         var i = 0
         paras.forEach {
             dataList[i++] = getData(it,ctx).toTypedArray()
         }
-        val result = CommonUtils.getCartesianProductByArray(dataList)
-        return result.toList()
+        return CommonUtils.getCartesianProductByArray(dataList)
     }
 
     private fun getData(para:Parameter,ctx:ApplicationContext):List<Any?>{
@@ -92,7 +91,7 @@ object SpringUtils{
         }
     }
 
-    private fun getData(method: Executable,para:Parameter, ctx:ApplicationContext):List<Any?>{
+    private fun getData(method: Executable,para:Parameter, ctx:ApplicationContext):Array<Array<Any?>>{
         val name = method.name.split(".").last()
         val qualifier = para.getAnnotation(Qualifier::class.java)
         val single = qualifier == null
@@ -100,13 +99,13 @@ object SpringUtils{
             true->{
                 val data = ctx.getBean(name)
                 if(data is BatchData){
-                    data.data
+                    data.data.map { arrayOf(it) }.toTypedArray()
                 }else{
-                    listOf(data)
+                    arrayOf(arrayOf(data))
                 }
             }
             false->{
-                ctx.getBeansOfType(para.type).filter { Pattern.matches(qualifier.value,it.key) }.map { it.value }
+                ctx.getBeansOfType(para.type).filter { Pattern.matches(qualifier.value,it.key) }.map { arrayOf(it.value) }.toTypedArray()
             }
         }
     }
@@ -124,7 +123,7 @@ object SpringUtils{
         return getData(para,ctx)
     }
 
-    fun getData(method:Executable,testDataConfig: TestDataConfig):List<Any?>{
+    fun getData(method:Executable,testDataConfig: TestDataConfig):Array<Array<Any?>>{
         val params = method.parameters
         val ctx = getContext(method.declaringClass,testDataConfig)
         return when(params.size){

@@ -6,7 +6,7 @@ import org.testng.annotations.Test;
 public class BatchDataTest {
 
     @Test(threadPoolSize = 20)
-    @com.apitest.dataProvider.TestData(source = DataSource.Spring,parallel = true)
+    @com.apitest.annotations.TestData(source = DataSource.Spring,parallel = true)
     public void batch(TestData d){
 
         System.out.println(d.getName());

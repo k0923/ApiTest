@@ -3,8 +3,7 @@ package com.apitest.utils
 import com.apitest.annotations.FlowTag
 import com.apitest.core.ApiBaseData
 import com.apitest.core.IDataLifeCycle
-import com.apitest.dataProvider.DataSource
-import com.apitest.dataProvider.TestData
+import com.apitest.annotations.TestData
 import com.apitest.dataProvider.TestDataConfig
 import com.apitest.extensions.ofType
 import org.apache.logging.log4j.LogManager
@@ -36,10 +35,8 @@ object ScriptUtils {
     }
 
 
-    fun getTestData(method: Executable): List<Any?> {
+    fun getTestData(method: Executable): Array<Array<Any?>> {
         val testDataConfigs = getTestDataConfig(method)
-
-
         return when(testDataConfigs.size){
             1->testDataConfigs[0].source.dataFromMethod(method,testDataConfigs[0])
             else-> {
@@ -50,13 +47,13 @@ object ScriptUtils {
                 method.parameters.indices.forEach {
                     data[it] = testDataConfigs[it].source.dataFromPara(method.parameters[it],testDataConfigs[it]).toTypedArray()
                 }
-                CommonUtils.getCartesianProductByArray(data).toList()
+                CommonUtils.getCartesianProductByArray(data)
             }
         }
     }
 
 
-    fun getTestDataConfig(data:TestData?):TestDataConfig{
+    fun getTestDataConfig(data: TestData?):TestDataConfig{
         val testDataConfig = TestDataConfig()
         if (data != null) {
             with(testDataConfig) {
