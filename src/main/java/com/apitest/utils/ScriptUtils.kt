@@ -13,6 +13,8 @@ import org.testng.IHookCallBack
 import org.testng.ITestResult
 import java.lang.reflect.Executable
 import java.lang.reflect.Method
+import java.util.function.Consumer
+import java.util.function.Supplier
 import java.util.regex.Pattern
 
 object ScriptUtils {
@@ -37,19 +39,35 @@ object ScriptUtils {
 
     fun getTestData(method: Executable): Array<Array<Any?>> {
         val testDataConfigs = getTestDataConfig(method)
-        return when(testDataConfigs.size){
-            1->testDataConfigs[0].source.dataFromMethod(method,testDataConfigs[0])
-            else-> {
-                if(testDataConfigs.size!=method.parameterCount){
-                    throw RuntimeException("The number of TestData is not equal to the number of Parameter")
-                }
-                val data = arrayOfNulls<Array<out Any?>>(method.parameterCount)
-                method.parameters.indices.forEach {
-                    data[it] = testDataConfigs[it].source.dataFromPara(method.parameters[it],testDataConfigs[it]).toTypedArray()
-                }
-                CommonUtils.getCartesianProductByArray(data)
+        val data = arrayOfNulls<Array<out Any?>>(method.parameterCount)
+
+        val defaultConsumer:Consumer<Iterable<Int>> = Consumer {
+            it.forEach{
+                data[it] = testDataConfigs[it].source.dataFromPara(method.parameters[it],testDataConfigs[it]).toTypedArray()
             }
         }
+
+        when(testDataConfigs.size){
+            1->return testDataConfigs[0].source.dataFromMethod(method,testDataConfigs[0])
+            method.parameterCount->{
+                defaultConsumer.accept(method.parameters.indices)
+            }
+            else-> {
+                if(testDataConfigs.size>method.parameterCount){
+                    defaultConsumer.accept(method.parameters.indices)
+                }else{
+                    defaultConsumer.accept(testDataConfigs.indices)
+                    for(i in testDataConfigs.size until method.parameters.size){
+                        if(method.parameters[i].type.isEnum){
+                            data[i] = method.parameters[i].type.enumConstants
+                        }else{
+                            throw RuntimeException("The number of TestData is not equal to the number of Parameter")
+                        }
+                    }
+                }
+            }
+        }
+        return CommonUtils.getCartesianProductByArray(data)
     }
 
 

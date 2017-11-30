@@ -1,19 +1,23 @@
 package com.apitest.dataProvider
 
+import com.apitest.annotations.Filter
 import com.apitest.annotations.TestData
-import com.apitest.testModels.StudentModel
+import com.apitest.testModels.Student
 import org.testng.Assert
 import org.testng.annotations.Test
 
 class CsvDataProviderTest {
 
+
+
     @Test
     @TestData(source = DataSource.CSV)
-    fun test(studentModel: StudentModel){
-        Assert.assertEquals(studentModel.name,"ZhouYang")
-        Assert.assertEquals(studentModel.age,22)
-        Assert.assertEquals(studentModel.isMan,true)
-        Assert.assertEquals(studentModel.money,10000.0)
+    @Filter(cls = ComboDataTest::class,methods = ["outerFilter"])
+    fun test(student: Student){
+        Assert.assertEquals(student.name,"ZhouYang")
+        Assert.assertEquals(student.age,22)
+        Assert.assertEquals(student.isMan,true)
+        Assert.assertEquals(student.money,10000.0)
     }
 
 

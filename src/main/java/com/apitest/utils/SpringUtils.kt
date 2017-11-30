@@ -1,11 +1,7 @@
 package com.apitest.utils
 
-import com.apitest.core.ITestData
 import com.apitest.dataProvider.TestDataConfig
-import com.apitest.extensions.ofType
 import com.apitest.spring.beanConfig.ApiBaseDataBeanConfigProcessor
-import com.apitest.spring.beanConfig.ApiBatchDataBeanConfigProcessor
-import com.apitest.spring.common.BatchData
 import com.apitest.utils.PathUtils.getClassFolder
 import com.apitest.utils.PathUtils.getResourceFile
 import org.apache.logging.log4j.LogManager
@@ -20,7 +16,6 @@ import java.lang.reflect.Executable
 import java.lang.reflect.Parameter
 import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.Pattern
-import javax.annotation.Nullable
 
 object SpringUtils{
 
@@ -40,7 +35,8 @@ object SpringUtils{
             return contextCache[resource.file.absolutePath]
         }
         return getContext(mapOf("ApiBaseDataBeanConfigProcessor" to ApiBaseDataBeanConfigProcessor::class.java
-            ,"ApiBatchDataBeanConfigProcessor" to ApiBatchDataBeanConfigProcessor::class.java),resource)
+            //,"ApiBatchDataBeanConfigProcessor" to ApiBatchDataBeanConfigProcessor::class.java
+        ),resource)
     }
 
     @Synchronized
@@ -72,43 +68,37 @@ object SpringUtils{
         contextCache.clear()
     }
 
+    private fun getTestData(para:Parameter,ctx:ApplicationContext,methodName:String?=null):List<Any?>{
+        val paraType = para.type
+        val qualifier = para.getAnnotation(Qualifier::class.java)
+        val data = ctx.getBeansOfType(paraType)
+        return when{
+            data.isEmpty() && paraType.isEnum -> paraType.enumConstants.toList()
+            qualifier==null && methodName!=null->data.filter { it.key == methodName }.map { it.value }
+            else->{
+                when(qualifier){
+                    null -> data.map { it.value }
+                    else->data.filter { Pattern.matches(qualifier.value,it.key) }.map { it.value }
+                }
+            }
+        }
+    }
 
-    private fun getData(paras:Array<Parameter>, ctx:ApplicationContext):Array<Array<Any?>>{
+    private fun getMutipleParameterData(paras:Array<Parameter>, ctx:ApplicationContext):Array<Array<Any?>>{
         val dataList = arrayOfNulls<Array<out Any?>>(paras.size)
         var i = 0
         paras.forEach {
-            dataList[i++] = getData(it,ctx).toTypedArray()
+            dataList[i++] = getTestData(it,ctx).toTypedArray()
         }
         return CommonUtils.getCartesianProductByArray(dataList)
     }
 
-    private fun getData(para:Parameter,ctx:ApplicationContext):List<Any?>{
-        val paraType = para.type
-        val qualifier = para.getAnnotation(Qualifier::class.java)
-        return when(qualifier){
-            null -> ctx.getBeansOfType(paraType).map { it.value }
-            else -> ctx.getBeansOfType(paraType).filter { Pattern.matches(qualifier.value,it.key) }.map { it.value }.toList()
-        }
+    private fun getOnlyOneParameterData(method:Executable,para:Parameter,ctx:ApplicationContext):Array<Array<Any?>>{
+        val name = method.name.split(".").last()
+        val data = getTestData(para,ctx,name)
+        return Array(data.size,{ arrayOf(data[it])})
     }
 
-    private fun getData(method: Executable,para:Parameter, ctx:ApplicationContext):Array<Array<Any?>>{
-        val name = method.name.split(".").last()
-        val qualifier = para.getAnnotation(Qualifier::class.java)
-        val single = qualifier == null
-        return when(single){
-            true->{
-                val data = ctx.getBean(name)
-                if(data is BatchData){
-                    data.data.map { arrayOf(it) }.toTypedArray()
-                }else{
-                    arrayOf(arrayOf(data))
-                }
-            }
-            false->{
-                ctx.getBeansOfType(para.type).filter { Pattern.matches(qualifier.value,it.key) }.map { arrayOf(it.value) }.toTypedArray()
-            }
-        }
-    }
 
     private fun getContext(cls:Class<*>,testDataConfig:TestDataConfig):ApplicationContext {
         return if(testDataConfig.file.isBlank()){
@@ -120,15 +110,15 @@ object SpringUtils{
 
     fun getData(para:Parameter,testDataConfig:TestDataConfig):List<Any?>{
         val ctx = getContext(para.declaringExecutable.declaringClass,testDataConfig)
-        return getData(para,ctx)
+        return getTestData(para,ctx)
     }
 
     fun getData(method:Executable,testDataConfig: TestDataConfig):Array<Array<Any?>>{
         val params = method.parameters
         val ctx = getContext(method.declaringClass,testDataConfig)
         return when(params.size){
-            1-> getData(method,params[0],ctx)
-            else->getData(params,ctx)
+            1-> getOnlyOneParameterData(method,params[0],ctx)
+            else->getMutipleParameterData(params,ctx)
         }
     }
 

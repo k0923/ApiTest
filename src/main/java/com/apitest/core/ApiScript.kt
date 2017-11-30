@@ -39,7 +39,7 @@ class ApiScript(val clazz:Class<*>, val methodName:String){
                     var datas = ScriptUtils.getTestData(method!!)
                     field = when(datas.size){
                         0 -> null
-                        1 -> datas[0]
+                        1 -> datas[0][0]
                         else -> throw RuntimeException("Multiple data got from method:$method")
                     }
                 }

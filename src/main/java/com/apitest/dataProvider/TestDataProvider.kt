@@ -6,14 +6,10 @@ import org.testng.annotations.DataProvider
 import java.lang.reflect.Constructor
 import java.lang.reflect.Executable
 import java.lang.reflect.Method
-import java.lang.reflect.Parameter
-import java.util.function.Predicate
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
-import kotlin.reflect.KType
 import kotlin.reflect.full.*
-import kotlin.reflect.jvm.javaMethod
-import kotlin.reflect.jvm.javaType
+import kotlin.reflect.jvm.isAccessible
 
 class TestDataProvider {
 
@@ -37,27 +33,25 @@ class TestDataProvider {
             }
         }
         val data = ScriptUtils.getTestData(method)
-
-
-        methodFilters?.let { fs->
-            val fMap = HashMap<KFunction<*>,HashMap<KParameter,Any?>>()
+        methodFilters?.let { fs ->
+            val fMap = HashMap<KFunction<*>, HashMap<KParameter, Any?>>()
             fs.forEach {
-                val paraMap = HashMap<KParameter,Any?>()
+                val paraMap = HashMap<KParameter, Any?>()
                 it.parameters.forEach {
-                    paraMap.put(it,null)
+                    paraMap.put(it, null)
                 }
-                fMap.put(it,paraMap)
+                fMap.put(it, paraMap)
             }
             val filterData = ArrayList<Array<Any?>>()
-            data.forEach {
-                d->
-                    if(!fs.any{f->
-                        val map = fMap[f]
-                        f.parameters.indices.forEach {
-                            map!![f.parameters[it]] = d[it]
-                        }
-                        f.callBy(map!!)==false
-                    }){
+            data.forEach { d ->
+                if (!fs.any { f ->
+                    val map = fMap[f]
+                    f.parameters.indices.forEach {
+                        map!![f.parameters[it]] = d[it]
+                    }
+                    f.isAccessible = true
+                    f.callBy(map!!) == false
+                }) {
                     filterData.add(d)
                 }
             }
@@ -77,28 +71,15 @@ class TestDataProvider {
         val methodNames = methods.map { it.name }
         filter.methods.forEach {
             if(!methodNames.contains(it)){
-                throw RuntimeException("Method:$it not found or non-static or return type is not boolean")
+                throw NoSuchMethodException("Method:[$it] not exist or non-static or return type is not boolean or method parameters not matched")
             }
         }
         return methods
     }
 
-
     private fun isMatch(paraA:List<KParameter>,paraB:Array<Class<*>>):Boolean = when {
         paraA.size != paraB.size -> false
         else -> !(0 until paraA.size).any { !paraA[it].type.isSupertypeOf(paraB[it].kotlin.createType()) }
     }
-
-//    private fun isMatch(paraA:List<KParameter>,paraB:Array<Class<*>>):Boolean {
-//        var match = true
-//        paraA.indices.forEach {
-//            if(!paraA[it].type.isSupertypeOf(paraB[it].kotlin.createType())){
-//                match =false
-//            }
-//        }
-//        match = (0 until paraA.size).any { paraA[it].type.isSupertypeOf(paraB[it].kotlin.createType()) }
-//        return match
-//        //(0 until paraA.size).any { !paraA[it].type.isSupertypeOf(paraB[it].kotlin.createType()) }
-//    }
 
 }
