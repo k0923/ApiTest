@@ -98,10 +98,13 @@ public class ComboDataTest {
     private Set<Student> set = new HashSet<>();
 
     @Test
-    @TestData(source=DataSource.CSV,file = "CsvDataProviderTest.csv",parallel=true)
-    @TestData(source=DataSource.CSV,file = "CsvDataProviderTest.csv",parallel=true)
-    @TestData(source=DataSource.Spring,file="SpringDataProviderTest.xml",parallel = true)
-    public void filterTest8(Student student,Student student1,String data,DataSource source1){
+//    @TestData(source=DataSource.CSV,file = "CsvDataProviderTest.csv",parallel=true)
+//    @TestData(source=DataSource.CSV,file = "CsvDataProviderTest.csv",parallel=true)
+//    @TestData(source=DataSource.Spring,file="SpringDataProviderTest.xml",parallel = true)
+    public void filterTest8(@TestData(source=DataSource.CSV,file = "CsvDataProviderTest.csv",parallel = true) Student student,
+                            @TestData(source=DataSource.CSV,file = "CsvDataProviderTest.csv",parallel = true) Student student1,
+                            @TestData(source=DataSource.Spring,file="SpringDataProviderTest.xml",parallel = true) String data,
+                            DataSource source1){
         set.add(student);
         set.add(student1);
     }
@@ -118,6 +121,12 @@ public class ComboDataTest {
     public void nullTest(Student student,@Qualifier String data){
         Assert.assertNull(data);
         Assert.assertEquals(student.getAge(),200);
+    }
+
+    @Test
+    @TestData(source=DataSource.Spring,file="SpringDataProviderTest.xml")
+    public void enumTest(DataSource source){
+
     }
 
 

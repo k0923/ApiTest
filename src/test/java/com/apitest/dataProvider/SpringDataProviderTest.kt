@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.testng.Assert
 import org.testng.annotations.AfterMethod
 import org.testng.annotations.Test
-import javax.annotation.Nullable
 import kotlin.reflect.jvm.javaMethod
 
 class SpringDataProviderTest{
@@ -66,7 +65,7 @@ class SpringDataProviderTest{
     }
 
     @Test
-    fun myFun(data1:String,@Qualifier(".+Test.+")data2:String,@Nullable data3:String){
+    fun myFun(data1:String,@Qualifier(".+Test.+")data2:String,data3:String){
 
     }
 
