@@ -23,4 +23,15 @@
     </bean>
 
 
+    <bean id="s1" class="com.apitest.testModels.Student" >
+        <property name="name" value="Y1"/>
+        <property name="age" value="20"/>
+        <property name="money" value="200"/>
+    </bean>
+
+    <bean id="s2" class="com.apitest.testModels.Student" scope="prototype">
+        <property name="name" value="Y2"/>
+        <property name="age" value="22"/>
+        <property name="money" value="202"/>
+    </bean>
 </beans>

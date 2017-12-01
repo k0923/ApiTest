@@ -39,14 +39,12 @@ object ScriptUtils {
 
     fun getTestData(method: Executable): Array<Array<Any?>> {
         val testDataConfigs = getTestDataConfig(method)
-        val data = arrayOfNulls<Array<out Any?>>(method.parameterCount)
-
+        val data= Array<Supplier<Array<out Any?>?>>(method.parameterCount,{_-> Supplier { null }})
         val defaultConsumer:Consumer<Iterable<Int>> = Consumer {
             it.forEach{
-                data[it] = testDataConfigs[it].source.dataFromPara(method.parameters[it],testDataConfigs[it]).toTypedArray()
+                data[it] = Supplier { testDataConfigs[it].source.dataFromPara(method.parameters[it],testDataConfigs[it]).toTypedArray()}
             }
         }
-
         when(testDataConfigs.size){
             1->return testDataConfigs[0].source.dataFromMethod(method,testDataConfigs[0])
             method.parameterCount->{
@@ -59,7 +57,7 @@ object ScriptUtils {
                     defaultConsumer.accept(testDataConfigs.indices)
                     for(i in testDataConfigs.size until method.parameters.size){
                         if(method.parameters[i].type.isEnum){
-                            data[i] = method.parameters[i].type.enumConstants
+                            data[i] = Supplier { method.parameters[i].type.enumConstants }
                         }else{
                             throw RuntimeException("The number of TestData is not equal to the number of Parameter")
                         }
@@ -67,7 +65,7 @@ object ScriptUtils {
                 }
             }
         }
-        return CommonUtils.getCartesianProductByArray(data)
+        return CommonUtils.getCartesianProductBySupplier(data)
     }
 
 

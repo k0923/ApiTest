@@ -5,7 +5,11 @@ import com.apitest.annotations.TestData;
 import com.apitest.testModels.Student;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
+
+import java.util.HashSet;
+import java.util.Set;
 
 
 public class ComboDataTest {
@@ -91,11 +95,20 @@ public class ComboDataTest {
         Assert.assertEquals(student.getAge(),200);
     }
 
+    private Set<Student> set = new HashSet<>();
+
     @Test
     @TestData(source=DataSource.CSV,file = "CsvDataProviderTest.csv",parallel=true)
+    @TestData(source=DataSource.CSV,file = "CsvDataProviderTest.csv",parallel=true)
     @TestData(source=DataSource.Spring,file="SpringDataProviderTest.xml",parallel = true)
-    public void filterTest8(Student student,String data,DataSource source,DataSource source1){
+    public void filterTest8(Student student,Student student1,String data,DataSource source1){
+        set.add(student);
+        set.add(student1);
+    }
 
+    @AfterClass
+    public void show(){
+        System.out.println(set.size());
     }
 
     @Test

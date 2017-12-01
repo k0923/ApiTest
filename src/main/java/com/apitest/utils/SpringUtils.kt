@@ -15,6 +15,7 @@ import org.springframework.core.io.Resource
 import java.lang.reflect.Executable
 import java.lang.reflect.Parameter
 import java.util.concurrent.ConcurrentHashMap
+import java.util.function.Supplier
 import java.util.regex.Pattern
 
 object SpringUtils{
@@ -85,12 +86,12 @@ object SpringUtils{
     }
 
     private fun getMutipleParameterData(paras:Array<Parameter>, ctx:ApplicationContext):Array<Array<Any?>>{
-        val dataList = arrayOfNulls<Array<out Any?>>(paras.size)
+        val dataList = Array<Supplier<Array<out Any?>?>>(paras.size,{_-> Supplier { null }})
         var i = 0
         paras.forEach {
-            dataList[i++] = getTestData(it,ctx).toTypedArray()
+            dataList[i++] = Supplier { getTestData(it,ctx).toTypedArray() }
         }
-        return CommonUtils.getCartesianProductByArray(dataList)
+        return CommonUtils.getCartesianProductBySupplier(dataList)
     }
 
     private fun getOnlyOneParameterData(method:Executable,para:Parameter,ctx:ApplicationContext):Array<Array<Any?>>{

@@ -2,10 +2,12 @@ package com.apitest.dataProvider
 
 import com.apitest.annotations.TestData
 import com.apitest.common.TestMethodLocal
+import com.apitest.testModels.Student
 import com.apitest.utils.ScriptUtils
 import com.apitest.utils.SpringUtils
 import org.springframework.beans.factory.annotation.Qualifier
 import org.testng.Assert
+import org.testng.annotations.AfterMethod
 import org.testng.annotations.Test
 import javax.annotation.Nullable
 import kotlin.reflect.jvm.javaMethod
@@ -79,7 +81,18 @@ class SpringDataProviderTest{
     }
 
 
+    val set = HashSet<Student>()
 
+    @Test
+    fun myFun3(stu1:Student,stu2:Student){
+       set.add(stu1)
+        set.add(stu2)
+    }
+
+    @AfterMethod
+    fun show(){
+        println(set.size)
+    }
 
 
 
