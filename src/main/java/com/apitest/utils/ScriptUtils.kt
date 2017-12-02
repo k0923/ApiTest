@@ -1,15 +1,14 @@
 package com.apitest.utils
 
 import com.apitest.annotations.FlowTag
+import com.apitest.annotations.TestData
 import com.apitest.core.ApiBaseData
 import com.apitest.core.IDataLifeCycle
-import com.apitest.annotations.TestData
 import com.apitest.dataProvider.IDataProvider
 import com.apitest.dataProvider.IParameterProvider
 import com.apitest.dataProvider.TestDataConfig
 import com.apitest.extensions.ofType
 import org.apache.logging.log4j.LogManager
-import org.springframework.expression.spel.support.StandardEvaluationContext
 import org.springframework.util.ReflectionUtils
 import org.testng.IHookCallBack
 import org.testng.ITestResult
@@ -58,11 +57,8 @@ object ScriptUtils {
         }
         when(testDataConfigs.size){
             1 -> return getProvider(testDataConfigs[0].provider).getData(method,testDataConfigs[0])                          //testDataConfigs[0].source.dataFromMethod(method,testDataConfigs[0])
-            method.parameterCount->{
-                defaultConsumer.accept(method.parameters.indices)
-            }
             else-> {
-                if(testDataConfigs.size>method.parameterCount){
+                if(testDataConfigs.size>=method.parameterCount){
                     defaultConsumer.accept(method.parameters.indices)
                 }else{
                     defaultConsumer.accept(testDataConfigs.indices)
@@ -132,10 +128,10 @@ object ScriptUtils {
     }
 
     fun execute(script: Any, methodName: String, filter: (Any?) -> Boolean, defaultExecution: (() -> Unit)? = null) {
-        var method: Method? = script.javaClass.methods.firstOrNull {
+        val method: Method? = script.javaClass.methods.firstOrNull {
             it.name == methodName && it.parameterCount == 1
         } ?: throw RuntimeException("method:$methodName not found")
-        var data = getTestData(method!!).firstOrNull(filter) ?: throw RuntimeException("test data not found with script:$script,method:$methodName")
+        val data = getTestData(method!!).firstOrNull(filter) ?: throw RuntimeException("test data not found with script:$script,method:$methodName")
 
         execute(script, data, method, defaultExecution)
     }
@@ -145,7 +141,7 @@ object ScriptUtils {
         if (method.parameterCount != 1 || !method.parameterTypes[0].isAssignableFrom(data.javaClass)) {
             throw IllegalArgumentException("method:$method not match with data:$data")
         }
-        var flowData = data.ofType(ApiBaseData::class.java)?.preApiScript?.execute()
+        val flowData = data.ofType(ApiBaseData::class.java)?.preApiScript?.execute()
         getRunMethod(defaultExecution)(data, flowData, method)
     }
 
@@ -159,8 +155,8 @@ object ScriptUtils {
         if (flowDatas.isEmpty()) {
             return
         }
-        var simpleContext = StandardEvaluationContext(data)
-        var pattern = Pattern.compile("(^@[a-zA-Z0-9_$]+)[.]?(.*)")
+        //var simpleContext = StandardEvaluationContext(data)
+        val pattern = Pattern.compile("(^@[a-zA-Z0-9_$]+)[.]?(.*)")
         data.flowData?.forEach {
             var subKey: String? = null
             var key = it.value
@@ -188,7 +184,7 @@ object ScriptUtils {
 
     fun addFlowData(obj: Any, flowDatas: MutableMap<String, Any?>) {
         ReflectionUtils.doWithFields(obj.javaClass, { f ->
-            var flowTag = f.getAnnotation(FlowTag::class.java)
+            val flowTag = f.getAnnotation(FlowTag::class.java)
             flowTag?.let {
                 var name = it.name
                 name = if (name.isBlank()) f.name else name

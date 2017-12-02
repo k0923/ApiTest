@@ -11,10 +11,4 @@ import java.lang.annotation.*;
 public @interface TestData {
     Class<? extends IDataProvider> provider() default Spring.class;
     String[] paras() default {};
-
-//    DataSource source() default DataSource.Spring;
-//    boolean single() default true;
-//    String file() default "";
-//    String pattern() default "";
-//    boolean parallel() default false;
 }
