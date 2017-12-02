@@ -10,6 +10,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KVisibility
 import kotlin.reflect.full.createInstance
+import kotlin.reflect.full.isSuperclassOf
 import kotlin.reflect.jvm.isAccessible
 
 
@@ -50,6 +51,9 @@ object DataUtils{
     }
 
     fun <T:Any> convertToObj(cls: KClass<T>, data:Map<String,String>):T{
+        if(Map::class.isSuperclassOf(cls)){
+            return data as T
+        }
         val item = cls.createInstance()
         cls.members.forEach {
             when(it){

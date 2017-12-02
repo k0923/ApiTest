@@ -7,6 +7,6 @@ interface IDataProvider {
 
     fun getData(method:Executable,testDataConfig:TestDataConfig):Array<Array<Any?>>
 
-    fun getData(para: Parameter, testDataConfig: TestDataConfig):List<Any?>
+    fun getData(para: Parameter, testDataConfig: TestDataConfig):List<Any?>?
 
 }

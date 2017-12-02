@@ -69,7 +69,7 @@ class P{
     @Test
     fun t(){
        val csv = Csv::class
-        val obj = csv.createInstance()
+
     }
 
 

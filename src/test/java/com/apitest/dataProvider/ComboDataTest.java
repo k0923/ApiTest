@@ -17,7 +17,7 @@ import java.util.Set;
 
 public class ComboDataTest {
 
-    private static boolean outerFilter(Student student){return student.getName().equals("ZhouYang");}
+    private static boolean outerFilter(Student student,Console console){return student.getName().equals("ZhouYang");}
 
     private static boolean filter1(Student student, String data){
         return student.getName().equals("Test");
@@ -143,6 +143,7 @@ public class ComboDataTest {
     public void comboTest(Student student,String data,Console console,DefaultPara para){
 
     }
+
 
 
     static boolean filterEnum(Console console){

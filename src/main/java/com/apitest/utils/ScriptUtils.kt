@@ -16,6 +16,7 @@ import java.lang.reflect.Executable
 import java.lang.reflect.Method
 import java.lang.reflect.Parameter
 import java.util.function.Consumer
+import java.util.function.Function
 import java.util.function.Supplier
 import java.util.regex.Pattern
 import kotlin.reflect.KClass
@@ -45,28 +46,26 @@ object ScriptUtils {
 
     fun getInstance(cls:KClass<*>):Any = cls.objectInstance ?: cls.createInstance()
 
-
-    fun getTestData(method: Executable): Array<Array<Any?>> {
-        val testDataConfigs = getTestDataConfig(method)
-        val data= Array<Supplier<Array<out Any?>?>>(method.parameterCount,{_-> Supplier { null }})
-        val defaultConsumer:Consumer<Iterable<Int>> = Consumer {
-            it.forEach{
-                val provider = getProvider(testDataConfigs[it].provider)
-                data[it] = Supplier { provider.getData(method.parameters[it],testDataConfigs[it]).toTypedArray() }
-            }
-        }
-        when(testDataConfigs.size){
-            1 -> return getProvider(testDataConfigs[0].provider).getData(method,testDataConfigs[0])                          //testDataConfigs[0].source.dataFromMethod(method,testDataConfigs[0])
-            else-> {
-                if(testDataConfigs.size>=method.parameterCount){
-                    defaultConsumer.accept(method.parameters.indices)
-                }else{
-                    defaultConsumer.accept(testDataConfigs.indices)
-                    (testDataConfigs.size until method.parameterCount).forEach { data[it] = Supplier { getEmptyConfigData(method.parameters[it]) } }
-                }
-            }
+    fun getDataTemplate(params:List<Any?>, other:List<Any?>, defaultFunction:Function<Int,Array<out Any?>?>, otherFunction:Function<Int,Array<out Any?>?>):Array<Array<Any?>>{
+        val data = Array<Supplier<Array<out Any?>?>>(params.size,{ Supplier { null }})
+        val consumer:(Iterable<Int>,Function<Int,Array<out Any?>?>)->Unit = { i,f->i.forEach{data[it]= Supplier { f.apply(it) }} }
+        if(other.size>params.size){
+            consumer(params.indices,defaultFunction)
+        }else{
+            consumer(other.indices,defaultFunction)
+            consumer((other.size until params.size),otherFunction)
         }
         return CommonUtils.getCartesianProductBySupplier(data)
+    }
+
+    fun getTestData(method:Executable):Array<Array<Any?>>{
+        val testDataConfigs = getTestDataConfig(method)
+        val defaultAction =Function<Int,Array<out Any?>?>{ getProvider(testDataConfigs[it].provider).getData(method.parameters[it],testDataConfigs[it])?.toTypedArray() }
+        val otherAction = Function<Int,Array<out Any?>?>{ getEmptyConfigData(method.parameters[it]) }
+        return when(testDataConfigs.size){
+            1 -> return getProvider(testDataConfigs[0].provider).getData(method,testDataConfigs[0])
+            else -> getDataTemplate(method.parameters.toList(),testDataConfigs.toList(),defaultAction,otherAction)
+        }
     }
 
 
@@ -96,7 +95,7 @@ object ScriptUtils {
         return when{
             tp.isEnum -> tp.enumConstants
             IParameterProvider::class.isSuperclassOf(tp.kotlin) -> ScriptUtils.getInstance(tp.kotlin).ofType(IParameterProvider::class.java)?.getData()?.toTypedArray()
-            else -> throw RuntimeException("No data provider for parameter:$para")
+            else -> null
         }
     }
 

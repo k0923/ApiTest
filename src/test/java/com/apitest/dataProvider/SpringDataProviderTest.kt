@@ -2,6 +2,7 @@ package com.apitest.dataProvider
 
 import com.apitest.annotations.TestData
 import com.apitest.common.TestMethodLocal
+import com.apitest.testModels.Console
 import com.apitest.testModels.Student
 import com.apitest.utils.ScriptUtils
 import com.apitest.utils.SpringUtils
@@ -68,12 +69,17 @@ class SpringDataProviderTest{
     }
 
     @Test
-    fun myFun1(@Qualifier data1:String){
+    fun myFun1(@Qualifier data1:String?){
 
     }
 
     @Test
     fun myFun2(data1:String,@Qualifier data2:String?){
+
+    }
+
+    @Test
+    fun myFun3(data1:String,console:Console){
 
     }
 
