@@ -13,7 +13,7 @@ import java.util.Date;
 
 public class SpringExtensionTest implements ITestScript {
     @Test
-    @TestData(file = "testData.xml")
+    @TestData(paras = "testData.xml")
     public void dateBeanDefinitionParserTest(Date date){
         Date now = new Date();
         long d20 = 20*24*3600*1000;
@@ -21,34 +21,34 @@ public class SpringExtensionTest implements ITestScript {
     }
 
     @Test
-    @TestData(file = "testData.xml")
+    @TestData(paras = "testData.xml")
     public void systemTimeBeanDefinitionParserTest_pure(Long time){
         System.out.println(time);
         Assert.assertNotNull(time);
     }
 
     @Test
-    @TestData(file = "testData.xml")
+    @TestData(paras = "testData.xml")
     public void systemTimeBeanDefinitionParserTest_pure_prefix_suffix(String data){
         System.out.println(data);
         Assert.assertNotNull(data);
     }
 
     @Test
-    @TestData(file="testData.xml")
+    @TestData(paras="testData.xml")
     public void envValueBeanDefinitionParserTest(String data){
         Assert.assertEquals(data,"sit_abc");
     }
 
 
     @Test
-    @TestData(file = "testData.xml")
+    @TestData(paras = "testData.xml")
     public void singletonTimeTest(Long time){
         //ScriptUtils.INSTANCE.getcon
     }
 
     @Test
-    @TestData(file="testData.xml")
+    @TestData(paras="testData.xml")
     public void strVlt(StringValidator validator){
         Assert.assertEquals(validator.getProperty(),"abc");
         Assert.assertEquals(validator.getExpect(),"bcd");
@@ -63,19 +63,19 @@ public class SpringExtensionTest implements ITestScript {
     }
 
     @Test
-    @TestData(file="testData.xml")
+    @TestData(paras="testData.xml")
     public void repeatTest(String repeat){
         Assert.assertEquals(repeat.length(),512);
     }
 
     @Test
-    @TestData(file="testData.xml")
+    @TestData(paras="testData.xml")
     public void repeatTest2(String repeat){
         Assert.assertEquals(repeat.length(),512);
     }
 
     @Test
-    @TestData(file="testData.xml")
+    @TestData(paras="testData.xml")
     public void repeatTest3(String repeat){
         Assert.assertEquals(repeat.length(),256);
     }

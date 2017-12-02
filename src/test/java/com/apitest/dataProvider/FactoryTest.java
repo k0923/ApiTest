@@ -10,7 +10,7 @@ public class FactoryTest {
     private String d;
 
     @Factory
-    @TestData(file = "SpringDataProviderTest.xml")
+    @TestData(paras = "SpringDataProviderTest.xml")
     public FactoryTest(String data){
         this.d = data;
     }

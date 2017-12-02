@@ -6,6 +6,11 @@ import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.io.Serializable
 import java.util.*
+import kotlin.reflect.KClass
+import kotlin.reflect.KMutableProperty
+import kotlin.reflect.KVisibility
+import kotlin.reflect.full.createInstance
+import kotlin.reflect.jvm.isAccessible
 
 
 object DataUtils{
@@ -42,6 +47,36 @@ object DataUtils{
             temp += temp
         }
         return temp
+    }
+
+    fun <T:Any> convertToObj(cls: KClass<T>, data:Map<String,String>):T{
+        val item = cls.createInstance()
+        cls.members.forEach {
+            when(it){
+                is KMutableProperty ->{
+
+                    if(data.containsKey(it.name)){
+                        val strValue = data[it.name]!!
+                        val value = when(it.returnType.classifier){
+                            String::class->strValue
+                            Int::class->strValue.toInt()
+                            Boolean::class->strValue.toBoolean()
+                            Double::class->strValue.toDouble()
+                            Long::class->strValue.toLong()
+                            Short::class->strValue.toShort()
+                            Float::class->strValue.toFloat()
+                            else -> null
+                        }
+
+                        if(it.visibility == KVisibility.PRIVATE){
+                            it.isAccessible = true
+                        }
+                        it.setter.call(item,value)
+                    }
+                }
+            }
+        }
+        return item
     }
 }
 

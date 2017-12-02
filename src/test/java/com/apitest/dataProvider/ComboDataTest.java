@@ -1,7 +1,10 @@
 package com.apitest.dataProvider;
 
 import com.apitest.annotations.Filter;
+import com.apitest.annotations.Parallel;
 import com.apitest.annotations.TestData;
+import com.apitest.core.ApiScript;
+import com.apitest.testModels.Console;
 import com.apitest.testModels.Student;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.testng.Assert;
@@ -21,10 +24,10 @@ public class ComboDataTest {
     }
 
     @Test
-    @TestData(source=DataSource.CSV,file = "CsvDataProviderTest.csv",parallel=true)
-    @TestData(source=DataSource.Spring,file="SpringDataProviderTest.xml",parallel = true)
+    @TestData(provider = Csv.class,paras = {"CsvDataProviderTest.csv"})
+    @TestData(paras={"SpringDataProviderTest.xml"})
     @Filter(cls = ComboDataTest.class,methods = {"filter1"})
-    public void filterTest1(Student student, String data) {
+    public void filterTest1(Student student, String data) throws InterruptedException {
         Assert.assertEquals(student.getName(),"Test");
         Assert.assertNotNull(data);
     }
@@ -34,8 +37,8 @@ public class ComboDataTest {
     }
 
     @Test
-    @TestData(source=DataSource.CSV,file = "CsvDataProviderTest.csv",parallel=true)
-    @TestData(source=DataSource.Spring,file="SpringDataProviderTest.xml",parallel = true)
+    @TestData(provider = Csv.class,paras = "CsvDataProviderTest.csv")
+    @TestData(paras= "SpringDataProviderTest.xml")
     @Filter(cls=ComboDataTest.class,methods={"filter2"})
     public void filterTest2(Student student,String data){
         Assert.assertEquals(data,"FactoryTest");
@@ -47,8 +50,8 @@ public class ComboDataTest {
     }
 
     @Test
-    @TestData(source=DataSource.CSV,file = "CsvDataProviderTest.csv",parallel=true)
-    @TestData(source=DataSource.Spring,file="SpringDataProviderTest.xml",parallel = true)
+    @TestData(provider = Csv.class,paras = "CsvDataProviderTest.csv")
+    @TestData(paras= "SpringDataProviderTest.xml")
     @Filter(cls=ComboDataTest.class,methods = {"filter3"})
     public void filterTest3(Student student,String data){
         Assert.assertNotNull(data);
@@ -56,8 +59,8 @@ public class ComboDataTest {
     }
 
     @Test
-    @TestData(source=DataSource.CSV,file = "CsvDataProviderTest.csv",parallel=true)
-    @TestData(source=DataSource.Spring,file="SpringDataProviderTest.xml",parallel = true)
+    @TestData(provider = Csv.class,paras = "CsvDataProviderTest.csv")
+    @TestData(paras= "SpringDataProviderTest.xml")
     @Filter(cls=ComboDataTest.class)
     public void filterTest4(Student student,String data){
         Assert.assertEquals(student.getName(),"Test");
@@ -66,8 +69,8 @@ public class ComboDataTest {
     }
 
     @Test
-    @TestData(source=DataSource.CSV,file = "CsvDataProviderTest.csv",parallel=true)
-    @TestData(source=DataSource.Spring,file="SpringDataProviderTest.xml",parallel = true)
+    @TestData(provider = Csv.class,paras = "CsvDataProviderTest.csv")
+    @TestData(paras= "SpringDataProviderTest.xml")
     @Filter(cls=ComboDataTest.class,methods = {"filter1","filter2"})
     public void filterTest5(Student student,String data){
         Assert.assertEquals(student.getName(),"Test");
@@ -75,8 +78,8 @@ public class ComboDataTest {
     }
 
     @Test
-    @TestData(source=DataSource.CSV,file = "CsvDataProviderTest.csv",parallel=true)
-    @TestData(source=DataSource.Spring,file="SpringDataProviderTest.xml",parallel = true)
+    @TestData(provider = Csv.class,paras = "CsvDataProviderTest.csv")
+    @TestData(paras= "SpringDataProviderTest.xml")
     @Filter(cls=ComboDataTest.class,methods = {"filter1"})
     @Filter(cls=ComboDataTest.class,methods = {"filter2"})
     public void filterTest6(Student student,String data){
@@ -85,8 +88,8 @@ public class ComboDataTest {
     }
 
     @Test
-    @TestData(source=DataSource.CSV,file = "CsvDataProviderTest.csv",parallel=true)
-    @TestData(source=DataSource.Spring,file="SpringDataProviderTest.xml",parallel = true)
+    @TestData(provider = Csv.class,paras = "CsvDataProviderTest.csv")
+    @TestData(paras= "SpringDataProviderTest.xml")
     @Filter(cls=ComboDataTest.class,methods = {"filter1"})
     @Filter(cls=ComboDataTest.class,methods = {"filter2","filter3"})
     public void filterTest7(Student student,String data){
@@ -98,15 +101,14 @@ public class ComboDataTest {
     private Set<Student> set = new HashSet<>();
 
     @Test
-//    @TestData(source=DataSource.CSV,file = "CsvDataProviderTest.csv",parallel=true)
-//    @TestData(source=DataSource.CSV,file = "CsvDataProviderTest.csv",parallel=true)
-//    @TestData(source=DataSource.Spring,file="SpringDataProviderTest.xml",parallel = true)
-    public void filterTest8(@TestData(source=DataSource.CSV,file = "CsvDataProviderTest.csv",parallel = true) Student student,
-                            @TestData(source=DataSource.CSV,file = "CsvDataProviderTest.csv",parallel = true) Student student1,
-                            @TestData(source=DataSource.Spring,file="SpringDataProviderTest.xml",parallel = true) String data,
-                            DataSource source1){
+    @TestData(provider = Csv.class,paras = "CsvDataProviderTest.csv")
+    @TestData(provider = Csv.class,paras = "CsvDataProviderTest.csv")
+    @TestData(paras= "SpringDataProviderTest.xml")
+    @Parallel
+    public void filterTest8(Student student, Student student1, String data,Console source1) throws InterruptedException {
         set.add(student);
         set.add(student1);
+
     }
 
     @AfterClass
@@ -115,8 +117,8 @@ public class ComboDataTest {
     }
 
     @Test
-    @TestData(source=DataSource.CSV,file = "CsvDataProviderTest.csv",parallel=true)
-    @TestData(source=DataSource.Spring,file="SpringDataProviderTest.xml",parallel = true)
+    @TestData(provider = Csv.class,paras = "CsvDataProviderTest.csv")
+    @TestData(paras= "SpringDataProviderTest.xml")
     @Filter(cls=ComboDataTest.class,methods = {"filter3"})
     public void nullTest(Student student,@Qualifier String data){
         Assert.assertNull(data);
@@ -124,11 +126,28 @@ public class ComboDataTest {
     }
 
     @Test
-    @TestData(source=DataSource.Spring,file="SpringDataProviderTest.xml")
-    public void enumTest(DataSource source){
+    @TestData(paras= "SpringDataProviderTest.xml")
+    public void enumTest(Console source){
+        Assert.assertNotNull(source);
+    }
+
+    @Test
+    @Filter(cls = ComboDataTest.class,methods = "filterEnum")
+    public void enumTest1(Console console){
+        Assert.assertEquals(console,Console.PS4);
+    }
+
+    @Test
+    @TestData(provider = Csv.class,paras = "CsvDataProviderTest.csv")
+    @TestData(paras= "SpringDataProviderTest.xml")
+    public void comboTest(Student student,String data,Console console,DefaultPara para){
 
     }
 
+
+    static boolean filterEnum(Console console){
+        return console==Console.PS4;
+    }
 
 
 

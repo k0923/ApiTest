@@ -27,8 +27,7 @@ class SpringDataProviderTest{
 
 
     @Test
-    @TestData(single = false)
-    fun batchTestData(data:String){
+    fun batchTestData(@Qualifier(".+") data:String){
         System.out.println(data)
         count.set(count.get()?.plus(1))
     }
@@ -36,22 +35,20 @@ class SpringDataProviderTest{
 
 
     @Test
-    @TestData(single = false,pattern = "single.*")
-    fun batchFilterTest(data:String){
+    fun batchFilterTest(@Qualifier("single.*") data:String){
         count.set(count.get()?.plus(1))
         Assert.assertEquals(data,"singleTestData")
     }
 
 
     @Test
-    @TestData(file = "file.xml")
+    @TestData(paras = ["file.xml"])
     fun otherFileTest(data:String){
         Assert.assertEquals(data,"otherFileTest")
     }
 
     @Test
-    @TestData(single = false)
-    fun getSystemData(d:Long){
+    fun getSystemData(@Qualifier(".+")d:Long){
         println(d)
     }
 //    ----------------
@@ -60,7 +57,8 @@ class SpringDataProviderTest{
         val m = this::myFun.javaMethod
 
         val config = ScriptUtils.getTestDataConfig(m!!)[0]
-        val result = SpringUtils.getData(m,config)
+        val result = Spring.getData(m,config)
+
 
     }
 

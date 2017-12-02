@@ -11,7 +11,7 @@ class CsvDataProviderTest {
 
 
     @Test
-    @TestData(source = DataSource.CSV)
+    @TestData(provider = Csv::class)
     @Filter(cls = ComboDataTest::class,methods = ["outerFilter"])
     fun test(student: Student){
         Assert.assertEquals(student.name,"ZhouYang")

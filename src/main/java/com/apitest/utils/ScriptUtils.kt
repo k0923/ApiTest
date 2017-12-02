@@ -4,6 +4,8 @@ import com.apitest.annotations.FlowTag
 import com.apitest.core.ApiBaseData
 import com.apitest.core.IDataLifeCycle
 import com.apitest.annotations.TestData
+import com.apitest.dataProvider.IDataProvider
+import com.apitest.dataProvider.IParameterProvider
 import com.apitest.dataProvider.TestDataConfig
 import com.apitest.extensions.ofType
 import org.apache.logging.log4j.LogManager
@@ -13,9 +15,13 @@ import org.testng.IHookCallBack
 import org.testng.ITestResult
 import java.lang.reflect.Executable
 import java.lang.reflect.Method
+import java.lang.reflect.Parameter
 import java.util.function.Consumer
 import java.util.function.Supplier
 import java.util.regex.Pattern
+import kotlin.reflect.KClass
+import kotlin.reflect.full.createInstance
+import kotlin.reflect.full.isSuperclassOf
 
 object ScriptUtils {
 
@@ -36,17 +42,22 @@ object ScriptUtils {
         return null
     }
 
+    fun getProvider(cls:KClass<out IDataProvider>):IDataProvider = cls.objectInstance ?: cls.createInstance()
+
+    fun getInstance(cls:KClass<*>):Any = cls.objectInstance ?: cls.createInstance()
+
 
     fun getTestData(method: Executable): Array<Array<Any?>> {
         val testDataConfigs = getTestDataConfig(method)
         val data= Array<Supplier<Array<out Any?>?>>(method.parameterCount,{_-> Supplier { null }})
         val defaultConsumer:Consumer<Iterable<Int>> = Consumer {
             it.forEach{
-                data[it] = Supplier { testDataConfigs[it].source.dataFromPara(method.parameters[it],testDataConfigs[it]).toTypedArray()}
+                val provider = getProvider(testDataConfigs[it].provider)
+                data[it] = Supplier { provider.getData(method.parameters[it],testDataConfigs[it]).toTypedArray() }
             }
         }
         when(testDataConfigs.size){
-            1->return testDataConfigs[0].source.dataFromMethod(method,testDataConfigs[0])
+            1 -> return getProvider(testDataConfigs[0].provider).getData(method,testDataConfigs[0])                          //testDataConfigs[0].source.dataFromMethod(method,testDataConfigs[0])
             method.parameterCount->{
                 defaultConsumer.accept(method.parameters.indices)
             }
@@ -55,13 +66,7 @@ object ScriptUtils {
                     defaultConsumer.accept(method.parameters.indices)
                 }else{
                     defaultConsumer.accept(testDataConfigs.indices)
-                    for(i in testDataConfigs.size until method.parameters.size){
-                        if(method.parameters[i].type.isEnum){
-                            data[i] = Supplier { method.parameters[i].type.enumConstants }
-                        }else{
-                            throw RuntimeException("The number of TestData is not equal to the number of Parameter")
-                        }
-                    }
+                    (testDataConfigs.size until method.parameterCount).forEach { data[it] = Supplier { getEmptyConfigData(method.parameters[it]) } }
                 }
             }
         }
@@ -73,12 +78,8 @@ object ScriptUtils {
         val testDataConfig = TestDataConfig()
         if (data != null) {
             with(testDataConfig) {
-                single = data.single
-                pattern = data.pattern
-                file = data.file
-                source = data.source
-                dataProvider = data.dataProvider
-                parallel = data.parallel
+                provider = data.provider
+                paras = data.paras
             }
         }
         return testDataConfig
@@ -87,32 +88,20 @@ object ScriptUtils {
     fun getTestDataConfig(method:Executable):Array<TestDataConfig>{
         val testDatas = method.getAnnotationsByType(TestData::class.java)
         return when(testDatas.size){
-            0-> arrayOf(getTestDataConfig(null))
-            else->testDatas.map { getTestDataConfig(it) }.toTypedArray()
+            0 -> arrayOf(getTestDataConfig(null))
+            else -> testDatas.map { getTestDataConfig(it) }.toTypedArray()
         }
     }
 
-//    fun getTestDataConfig(testData: TestData?): TestDataConfig {
-//        val testDataConfig = TestDataConfig()
-//        if (testData != null) {
-//            with(testDataConfig) {
-//                single = testData.single
-//                pattern = testData.pattern
-//                file = testData.file
-//            }
-//        }
-//        return testDataConfig
-//    }
 
-//    fun getTestDataConfig(method: Method): TestDataConfig {
-//        val testConfig = method.getAnnotation(TestData::class.java)
-//        return getTestDataConfig(testConfig)
-//    }
 
-    fun getTestMethod(clazz: Class<*>, methodName: String): Method {
-        return clazz.methods.firstOrNull {
-            it.name == methodName && it.parameterCount == 1
-        } ?: throw RuntimeException("method:$methodName not found")
+    fun getEmptyConfigData(para:Parameter):Array<out Any?>?{
+        val tp = para.type
+        return when{
+            tp.isEnum -> tp.enumConstants
+            IParameterProvider::class.isSuperclassOf(tp.kotlin) -> ScriptUtils.getInstance(tp.kotlin).ofType(IParameterProvider::class.java)?.getData()?.toTypedArray()
+            else -> throw RuntimeException("No data provider for parameter:$para")
+        }
     }
 
 

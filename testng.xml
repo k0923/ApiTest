@@ -1,9 +1,9 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 <suite name="sampleTest">
 
-    <!--<listeners>-->
-        <!--<listener class-name="com.apitest.nglisteners.ApiTestListener"/>-->
-    <!--</listeners>-->
+    <listeners>
+        <listener class-name="com.apitest.nglisteners.ApiTestListener"/>
+    </listeners>
     <!--<test name="sample-Test" verbose="1">-->
     <!--<packages>-->
     <!--<package name="com.kb.testcases.*"/>-->
@@ -12,15 +12,15 @@
 
     <test name="groupTest" >
 
-        <!--<packages>-->
-            <!--<package name="com.apitest.*"/>-->
-           <!---->
-        <!--</packages>-->
-        <classes>
-            <class name="com.apitest.Practice"/>
-            <class name="com.apitest.Practice1"/>
-            <class name="com.apitest.Practice2"/>
-        </classes>
+        <packages>
+            <package name="com.apitest.*"/>
+
+        </packages>
+        <!--<classes>-->
+            <!--<class name="com.apitest.Practice"/>-->
+            <!--<class name="com.apitest.Practice1"/>-->
+            <!--<class name="com.apitest.Practice2"/>-->
+        <!--</classes>-->
     </test>
 
 </suite>

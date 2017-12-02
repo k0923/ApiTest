@@ -1,5 +1,6 @@
 package com.apitest.nglisteners
 
+import com.apitest.annotations.Parallel
 import com.apitest.core.ApiBaseData
 import com.apitest.core.IDataLifeCycle
 import com.apitest.dataProvider.TestDataProvider
@@ -85,10 +86,9 @@ class ApiTestListener: IHookable, IAnnotationTransformer2, ISuiteListener,IClass
         method?.parameters?.let {
             if (it.isNotEmpty()) {
                 if (annotation?.dataProvider?.isEmpty() == true) {
-                    val testDataConfigs = ScriptUtils.getTestDataConfig(method)
+                    val parallel = method.getAnnotation(Parallel::class.java)
                     annotation.dataProviderClass = TestDataProvider::class.java
-                    annotation.dataProvider = if(testDataConfigs.any { it.parallel==false }) "getData" else "getDataParallel"
-                            //if (testDataConfig.parallel) "getDataParallel" else "getData"
+                    annotation.dataProvider = if(parallel==null) "getData" else "getDataParallel"
                 }
             }
         }
