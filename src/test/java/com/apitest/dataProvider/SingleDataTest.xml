@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="partA_stu1" scope="prototype" class="com.apitest.testModels.Student">
+        <property name="name" value="WANG_A"/>
+        <property name="id" value="001"/>
+        <property name="age" value="12"/>
+        <property name="money" value="100.00"/>
+        <property name="man" value="true"/>
+    </bean>
+
+    <bean id="partA_stu2" parent="partA_stu1">
+        <property name="name" value="ZHANG_B"/>
+        <property name="age" value="23"/>
+        <property name="id" value="002"/>
+    </bean>
+
+    <bean id="partB_stu3" parent="partA_stu1">
+        <property name="name" value="ZHANG_C"/>
+        <property name="money" value="200.00"/>
+        <property name="id" value="003"/>
+        <property name="man" value="false"/>
+    </bean>
+
+    <bean id="partB_stu4" parent="partA_stu1">
+        <property name="name" value="LI_D"/>
+        <property name="money" value="200.00"/>
+        <property name="id" value="003"/>
+        <property name="man" value="false"/>
+    </bean>
+
+    <bean id="outSpringFile" parent="partA_stu1"/>
+
+</beans>

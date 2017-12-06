@@ -16,7 +16,7 @@ class CsvDataProviderTest {
     @Test
     @TestData(provider = Csv::class)
     @Filter(cls = ComboDataTest::class,methods = ["outerFilter"])
-    fun test(student: Student,console:Console){
+    fun test(student: Student, console:Console){
         Assert.assertEquals(student.name,"ZhouYang")
         Assert.assertEquals(student.age,22)
         Assert.assertEquals(student.isMan,true)

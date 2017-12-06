@@ -3,7 +3,6 @@ package com.apitest.dataProvider;
 import com.apitest.annotations.Filter;
 import com.apitest.annotations.Parallel;
 import com.apitest.annotations.TestData;
-import com.apitest.core.ApiScript;
 import com.apitest.testModels.Console;
 import com.apitest.testModels.Student;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,7 +16,7 @@ import java.util.Set;
 
 public class ComboDataTest {
 
-    private static boolean outerFilter(Student student,Console console){return student.getName().equals("ZhouYang");}
+    private static boolean outerFilter(Student student, Console console){return student.getName().equals("Young");}
 
     private static boolean filter1(Student student, String data){
         return student.getName().equals("Test");

@@ -5,7 +5,6 @@ import com.apitest.common.TestMethodLocal
 import com.apitest.testModels.Console
 import com.apitest.testModels.Student
 import com.apitest.utils.ScriptUtils
-import com.apitest.utils.SpringUtils
 import org.springframework.beans.factory.annotation.Qualifier
 import org.testng.Assert
 import org.testng.annotations.AfterMethod
