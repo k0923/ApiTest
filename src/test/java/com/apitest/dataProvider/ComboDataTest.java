@@ -87,7 +87,7 @@ public class ComboDataTest {
         Assert.assertEquals(data,"FactoryTest");
     }
 
-    @Test
+    @Test(groups = {"p1"})
     @TestData(provider = Csv.class,paras = "CsvDataProviderTest.csv")
     @TestData(paras= "SpringDataProviderTest.xml")
     @Filter(cls=ComboDataTest.class,methods = {"filter1"})
@@ -100,7 +100,7 @@ public class ComboDataTest {
 
     private Set<Student> set = new HashSet<>();
 
-    @Test
+    @Test(groups = {"p1"})
     @TestData(provider = Csv.class,paras = "CsvDataProviderTest.csv")
     @TestData(provider = Csv.class,paras = "CsvDataProviderTest.csv")
     @TestData(paras= "SpringDataProviderTest.xml")
@@ -116,7 +116,7 @@ public class ComboDataTest {
         System.out.println(set.size());
     }
 
-    @Test
+    @Test(groups = {"p1"})
     @TestData(provider = Csv.class,paras = "CsvDataProviderTest.csv")
     @TestData(paras= "SpringDataProviderTest.xml")
     @Filter(cls=ComboDataTest.class,methods = {"filter3"})
@@ -125,19 +125,19 @@ public class ComboDataTest {
         Assert.assertEquals(student.getAge(),200);
     }
 
-    @Test
+    @Test(groups = {"p1"})
     @TestData(paras= "SpringDataProviderTest.xml")
     public void enumTest(Console source){
         Assert.assertNotNull(source);
     }
 
-    @Test
+    @Test(groups = {"p1"})
     @Filter(cls = ComboDataTest.class,methods = "filterEnum")
     public void enumTest1(Console console){
         Assert.assertEquals(console,Console.PS4);
     }
 
-    @Test
+    @Test(groups = {"p1"})
     @TestData(provider = Csv.class,paras = "CsvDataProviderTest.csv")
     @TestData(paras= "SpringDataProviderTest.xml")
     public void comboTest(Student student,String data,Console console,DefaultPara para){

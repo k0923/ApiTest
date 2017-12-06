@@ -2,25 +2,19 @@ package com.apitest
 
 import com.apitest.config.GlobalConfig
 import org.apache.ibatis.annotations.Select
+import org.springframework.beans.factory.annotation.Qualifier
+import org.testng.annotations.Test
 
 class DbTest {
 
-    //@Test
+    @Test
     //@TestData(single = false, parallel = true)
-    fun test(orderId: String) {
-
-
+    fun test(@Qualifier("o1") orderId: String) {
         var mapper = GlobalConfig.get(OrderMapper::class.java)
-
         //mapper?.getOrder(mapOf("1" to 1))
         // println(mapper?.getOrder("2ok3j4ok32421",TestPlugin()))
         println(mapper?.getOrderByOrderNo(orderId, "ORDER_CLOSED"))
-
-
     }
-
-
-
 }
 
 

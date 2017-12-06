@@ -1,19 +1,14 @@
 package com.apitest.dataProvider
 
-import com.apitest.extensions.ofType
-import com.apitest.utils.CommonUtils
 import com.apitest.utils.PathUtils.getClassFolder
 import com.apitest.utils.ScriptUtils
 import com.apitest.utils.SpringUtils
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.ApplicationContext
 import java.lang.reflect.Executable
-import java.lang.reflect.Method
 import java.lang.reflect.Parameter
-import java.util.function.Supplier
 import java.util.function.Function
 import java.util.regex.Pattern
-import kotlin.reflect.full.isSuperclassOf
 
 object Spring:IDataProvider{
     override fun getData(method: Executable, testDataConfig: TestDataConfig): Array<Array<Any?>> {

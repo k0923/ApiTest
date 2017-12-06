@@ -10,7 +10,8 @@
     <!--</packages>-->
     <!--</test>-->
 
-    <test name="groupTest" >
+    <test name="groupTest" parallel="instances" thread-count="10">
+
 
         <packages>
             <package name="com.apitest.*"/>

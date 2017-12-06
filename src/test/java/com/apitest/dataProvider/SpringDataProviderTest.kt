@@ -16,18 +16,18 @@ class SpringDataProviderTest{
 
     var count = TestMethodLocal(0)
 
-    @Test
+    @Test(groups = ["p1"])
     fun noDataProviderTest(){
         println("Hello")
     }
 
-    @Test
+    @Test(groups = ["p1"])
     fun singleTestData(data:String){
         Assert.assertEquals(data,"singleTestData")
     }
 
 
-    @Test
+    @Test(groups = ["p1"])
     fun batchTestData(@Qualifier(".+") data:String){
         System.out.println(data)
         count.set(count.get()?.plus(1))
@@ -35,20 +35,20 @@ class SpringDataProviderTest{
 
 
 
-    @Test
+    @Test(groups = ["p1"])
     fun batchFilterTest(@Qualifier("single.*") data:String){
         count.set(count.get()?.plus(1))
         Assert.assertEquals(data,"singleTestData")
     }
 
 
-    @Test
+    @Test(groups = ["p1"])
     @TestData(paras = ["file.xml"])
     fun otherFileTest(data:String){
         Assert.assertEquals(data,"otherFileTest")
     }
 
-    @Test
+    @Test(groups = ["p1"])
     fun getSystemData(@Qualifier(".+")d:Long){
         println(d)
     }

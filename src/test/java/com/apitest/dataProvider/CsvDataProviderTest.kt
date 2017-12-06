@@ -10,7 +10,8 @@ import org.testng.annotations.Test
 
 class CsvDataProviderTest {
 
-
+//    @Factory
+//    constructor(console:Console)
 
     @Test
     @TestData(provider = Csv::class)
