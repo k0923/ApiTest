@@ -46,36 +46,35 @@ object ScriptUtils {
 
     fun getInstance(cls:KClass<*>):Any = cls.objectInstance ?: cls.createInstance()
 
-    fun getDataTemplate(params:List<Any?>, other:List<Any?>, defaultFunction:Function<Int,Array<out Any?>?>, otherFunction:Function<Int,Array<out Any?>?>):Array<Array<Any?>>{
+    fun getDataTemplate(params:List<Any?>, other:List<Any?>, configAction:Function<Int,Array<out Any?>?>, otherAction:Function<Int,Array<out Any?>?>):Array<Array<Any?>>{
         val data = Array<Supplier<Array<out Any?>?>>(params.size,{ Supplier { null }})
         val consumer:(Iterable<Int>,Function<Int,Array<out Any?>?>)->Unit = { i,f->i.forEach{data[it]= Supplier { f.apply(it) }} }
         if(other.size>params.size){
-            consumer(params.indices,defaultFunction)
+            consumer(params.indices,configAction)
         }else{
-            consumer(other.indices,defaultFunction)
-            consumer((other.size until params.size),otherFunction)
+            consumer(other.indices,configAction)
+            consumer((other.size until params.size),otherAction)
         }
         return CommonUtils.getCartesianProductBySupplier(data)
     }
 
     fun getTestData(method:Executable):Array<Array<Any?>>{
         val testDataConfigs = getTestDataConfig(method)
-        val defaultAction =Function<Int,Array<out Any?>?>{ getProvider(testDataConfigs[it].provider).getData(method.parameters[it],testDataConfigs[it])?.toTypedArray() }
         val otherAction = Function<Int,Array<out Any?>?>{ getEmptyConfigData(method.parameters[it]) }
+        val configAction = Function<Int,Array<out Any?>?>{ getProvider(testDataConfigs[it].provider).getData(method.parameters[it],testDataConfigs[it])?.toTypedArray() }
+
         return when(testDataConfigs.size){
-            1 -> return getProvider(testDataConfigs[0].provider).getData(method,testDataConfigs[0])
-            else -> getDataTemplate(method.parameters.toList(),testDataConfigs.toList(),defaultAction,otherAction)
+            0-> getDataTemplate(method.parameters.toList(),testDataConfigs.toList(),otherAction,otherAction)
+            else ->getDataTemplate(method.parameters.toList(),testDataConfigs.toList(),configAction,otherAction)
         }
     }
 
 
-    fun getTestDataConfig(data: TestData?):TestDataConfig{
+    fun getTestDataConfig(data: TestData):TestDataConfig{
         val testDataConfig = TestDataConfig()
-        if (data != null) {
-            with(testDataConfig) {
-                provider = data.provider
-                paras = data.paras
-            }
+        with(testDataConfig) {
+            provider = data.provider
+            paras = data.paras
         }
         return testDataConfig
     }
@@ -83,7 +82,10 @@ object ScriptUtils {
     fun getTestDataConfig(method:Executable):Array<TestDataConfig>{
         val testDatas = method.getAnnotationsByType(TestData::class.java)
         return when(testDatas.size){
-            0 -> arrayOf(getTestDataConfig(null))
+            0 -> {
+                val testDatasFromType = method.declaringClass.getAnnotationsByType(TestData::class.java)
+                testDatasFromType.map { getTestDataConfig(it) }.toTypedArray()
+            }
             else -> testDatas.map { getTestDataConfig(it) }.toTypedArray()
         }
     }

@@ -10,7 +10,7 @@
     <!--</packages>-->
     <!--</test>-->
 
-    <test name="groupTest" parallel="instances" thread-count="10">
+    <test name="groupTest" >
 
 
         <packages>

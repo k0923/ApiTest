@@ -125,7 +125,6 @@ public class ComboDataTest {
     }
 
     @Test(groups = {"p1"})
-    @TestData(paras= "SpringDataProviderTest.xml")
     public void enumTest(Console source){
         Assert.assertNotNull(source);
     }

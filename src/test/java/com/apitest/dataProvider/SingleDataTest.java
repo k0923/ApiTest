@@ -10,6 +10,7 @@ import org.testng.annotations.Test;
 
 import java.util.Map;
 
+
 public class SingleDataTest {
 
     /*
@@ -18,12 +19,14 @@ public class SingleDataTest {
     并且找到id=partA_stu1的Bean
     */
     @Test
+    @TestData
     public void partA_stu1(Student student){
         //在Spring中id=stu1的student的name叫WANG_A
         Assert.assertEquals(student.getName(),"WANG_A");
     }
 
     @Test
+    @TestData
     public void stu(Student student){
         //由于Spring中未有id=stu的student,故为空
         Assert.assertNull(student);
@@ -35,6 +38,7 @@ public class SingleDataTest {
     此例中由于正则表达式匹配所有id，所以该用例将会运行多次
      */
     @Test
+    @TestData
     public void stus(@Qualifier(".+") Student student){
         Assert.assertNotNull(student);
     }
@@ -43,6 +47,7 @@ public class SingleDataTest {
     匹配所有id以partA为开头的student
      */
     @Test
+    @TestData
     public void partA(@Qualifier("partA.+") Student student){
         Assert.assertNotNull(student);
     }
@@ -74,6 +79,7 @@ public class SingleDataTest {
     最终返回满足符合过滤器的student
      */
     @Test
+    @TestData
     @Filter(cls = SingleDataTest.class,methods = {"studentFilter1"})
     public void filterStus(@Qualifier(".+") Student student){
         Assert.assertEquals(student.isMan(),true);

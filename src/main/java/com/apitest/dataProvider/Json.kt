@@ -13,7 +13,7 @@ object Json :IDataProvider {
 
     val gson = Gson()
 
-    override fun getData(method: Executable, testDataConfig: TestDataConfig): Array<Array<Any?>> {
+    fun getData(method: Executable, testDataConfig: TestDataConfig): Array<Array<Any?>> {
         val files = getFiles(method.declaringClass, testDataConfig)
         val defaultFunction = Function<Int,Array<out Any?>?>{
             arrayOf(gson.fromJson(FileUtils.readAsTxt(files[it]),method.parameterTypes[it]))

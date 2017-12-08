@@ -1,5 +1,6 @@
 package com.apitest
 
+import com.apitest.annotations.TestData
 import com.apitest.config.GlobalConfig
 import org.apache.ibatis.annotations.Select
 import org.springframework.beans.factory.annotation.Qualifier
@@ -9,6 +10,7 @@ class DbTest {
 
     @Test
     //@TestData(single = false, parallel = true)
+    @TestData
     fun test(@Qualifier("o1") orderId: String) {
         var mapper = GlobalConfig.get(OrderMapper::class.java)
         //mapper?.getOrder(mapOf("1" to 1))
