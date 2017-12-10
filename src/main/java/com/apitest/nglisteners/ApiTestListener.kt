@@ -76,7 +76,7 @@ class ApiTestListener: IHookable, IAnnotationTransformer2, ISuiteListener,IClass
             return
         }
         if(method==null){
-            annotation.dataProvider = "getConstructorData"
+            annotation.dataProvider = "getData"
             annotation.dataProviderClass = TestDataProvider::class.java
         }
     }
@@ -93,14 +93,6 @@ class ApiTestListener: IHookable, IAnnotationTransformer2, ISuiteListener,IClass
             }
         }
 //todo testng这边有个BUG，已经反馈给testng团队了，等修复完才能用，否则没屌用
-//                var provider = DataSource.Spring
-//                var testData = method.getAnnotation(TestData::class.java)
-//                if(testData!=null){
-//                    provider = testData.source
-//                }
-//                var config = provider.getConfig()
-//                annotation.dataProviderClass = config.first
-//                annotation.dataProvider = config.second
 
 //        val set = HashSet<String>()
 //        annotation?.dependsOnMethods?.let {

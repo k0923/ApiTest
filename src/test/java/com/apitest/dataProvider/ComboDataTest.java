@@ -57,10 +57,22 @@ public class ComboDataTest {
         Assert.assertEquals(student.getAge(),200);
     }
 
+
+    private boolean filter11(Student student, String data){
+        return student.getName().equals("Test");
+    }
+
+    public boolean filter22(Student student,String data){
+        return data.equals("FactoryTest");
+    }
+
+
+
     @Test
     @TestData(provider = Csv.class,paras = "CsvDataProviderTest.csv")
     @TestData(paras= "SpringDataProviderTest.xml")
-    @Filter(cls=ComboDataTest.class)
+    @Filter(cls=ComboDataTest.class,methods = {"filter11","filter22"})
+    @Filter(cls=OtherFilters.class,methods = {"filter3"})
     public void filterTest4(Student student,String data){
         Assert.assertEquals(student.getName(),"Test");
         Assert.assertEquals(data,"FactoryTest");
@@ -105,8 +117,11 @@ public class ComboDataTest {
     @TestData(paras= "SpringDataProviderTest.xml")
     @Parallel
     public void filterTest8(Student student, Student student1, String data,Console source1) throws InterruptedException {
-        set.add(student);
-        set.add(student1);
+        synchronized (set){
+            set.add(student);
+            set.add(student1);
+        }
+
 
     }
 
