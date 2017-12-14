@@ -16,9 +16,9 @@ object CommonUtils {
         var layer = total
         var index: Int
         for(i in 0 until data.size){
-            layer /= getSize(myData[i]?.size)
-            index = 0
             val size = getSize(myData[i]?.size)
+            layer /= size
+            index = 0
             for(j in 0 until total){
                 result[j][i] = when(myData[i]?.size){
                     null->null
@@ -50,9 +50,9 @@ object CommonUtils {
         var layer = total
         var index: Int
         for(i in 0 until data.size){
-            layer /= getSize(data[i]?.size)
-            index = 0
             val size = getSize(data[i]?.size)
+            layer /= size
+            index = 0
             for(j in 0 until total){
                 result[j][i] = when(data[i]?.size){
                     null->null

@@ -6,7 +6,6 @@ import com.apitest.core.ApiBaseData
 import com.apitest.core.IDataLifeCycle
 import com.apitest.dataProvider.IDataProvider
 import com.apitest.dataProvider.IParameterProvider
-import com.apitest.dataProvider.TestDataConfig
 import com.apitest.extensions.ofType
 import org.apache.logging.log4j.LogManager
 import org.springframework.util.ReflectionUtils
@@ -15,7 +14,6 @@ import org.testng.ITestResult
 import java.lang.reflect.Executable
 import java.lang.reflect.Method
 import java.lang.reflect.Parameter
-import java.util.function.Consumer
 import java.util.function.Function
 import java.util.function.Supplier
 import java.util.regex.Pattern
@@ -59,37 +57,22 @@ object ScriptUtils {
     }
 
     fun getTestData(method:Executable):Array<Array<Any?>>{
-        val testDataConfigs = getTestDataConfig(method)
+        val testDatas = getTestDataConfig(method)
         val otherAction = Function<Int,Array<out Any?>?>{ getEmptyConfigData(method.parameters[it]) }
-        val configAction = Function<Int,Array<out Any?>?>{ getProvider(testDataConfigs[it].provider).getData(method.parameters[it],testDataConfigs[it])?.toTypedArray() }
 
-        return when(testDataConfigs.size){
-            0-> getDataTemplate(method.parameters.toList(),testDataConfigs.toList(),otherAction,otherAction)
-            else ->getDataTemplate(method.parameters.toList(),testDataConfigs.toList(),configAction,otherAction)
-        }
-    }
-
-
-    fun getTestDataConfig(data: TestData):TestDataConfig{
-        val testDataConfig = TestDataConfig()
-        with(testDataConfig) {
-            provider = data.provider
-            paras = data.paras
-        }
-        return testDataConfig
-    }
-
-    fun getTestDataConfig(method:Executable):Array<TestDataConfig>{
-        val testDatas = method.getAnnotationsByType(TestData::class.java)
+        val initDatas = Array(testDatas.size){i-> getProvider(testDatas[i].provider).getData(method.parameters[i],testDatas[i])}
+        val configAction = Function<Int,Array<out Any?>?>{ getProvider(testDatas[it].provider).clone(method.parameters[it],testDatas[it],initDatas[it])?.toTypedArray() }
         return when(testDatas.size){
-            0 -> {
-                val testDatasFromType = method.declaringClass.getAnnotationsByType(TestData::class.java)
-                testDatasFromType.map { getTestDataConfig(it) }.toTypedArray()
-            }
-            else -> testDatas.map { getTestDataConfig(it) }.toTypedArray()
+            0-> getDataTemplate(method.parameters.toList(),testDatas.toList(),otherAction,otherAction)
+            else ->getDataTemplate(method.parameters.toList(),testDatas.toList(),configAction,otherAction)
         }
     }
 
+
+    fun getTestDataConfig(method:Executable):Array<TestData>{
+        val testDatas = method.getAnnotationsByType(TestData::class.java)
+        return if(testDatas.isEmpty()) method.declaringClass.getAnnotationsByType(TestData::class.java) else testDatas
+    }
 
 
     fun getEmptyConfigData(para:Parameter):Array<out Any?>?{

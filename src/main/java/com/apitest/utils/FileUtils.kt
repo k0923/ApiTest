@@ -22,8 +22,7 @@ object FileUtils {
 
     fun read(file: File,consumer: Consumer<String>) {
         val br = BufferedReader(FileReader(file))
-        br.lines().forEach(consumer)
-        br.close()
+        br.use { it.lines().forEach(consumer) }
     }
 
     fun read(file:File,split: Char):List<List<String>>{

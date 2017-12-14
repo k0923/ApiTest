@@ -1,8 +1,9 @@
 package com.apitest.testModels
 
+import java.io.Serializable
 
 
-open class People {
+open class People : Serializable {
     var id: String = ""
     var age:Int = 0
     var name:String?=null

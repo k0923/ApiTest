@@ -1,5 +1,6 @@
 package com.apitest.utils
 
+import com.apitest.utils.DataUtils.clone
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.ObjectInputStream
@@ -15,6 +16,20 @@ import kotlin.reflect.jvm.isAccessible
 
 
 object DataUtils{
+
+
+    fun <T> clone(obj:T?):T?{
+        return obj?.let {
+            val byteOutStream = ByteArrayOutputStream()
+            val outputStream = ObjectOutputStream(byteOutStream)
+            outputStream.writeObject(obj)
+            val byteInStream = ByteArrayInputStream(byteOutStream.toByteArray())
+            val inputStream = ObjectInputStream(byteInStream)
+            inputStream.use {
+                return it.readObject() as T?
+            }
+        }
+    }
 
     fun <T:Serializable> T.clone():T{
         val byteOutStream = ByteArrayOutputStream()

@@ -1,5 +1,6 @@
 package com.apitest.dataProvider
 
+import com.apitest.annotations.TestData
 import com.apitest.utils.FileUtils
 import com.apitest.utils.PathUtils.getClassFolder
 import com.apitest.utils.ScriptUtils
@@ -9,12 +10,12 @@ import java.lang.reflect.Executable
 import java.lang.reflect.Parameter
 import java.util.function.Function
 
-object Json :IDataProvider {
+object Json :AbstractDataProvider() {
 
     val gson = Gson()
 
-    fun getData(method: Executable, testDataConfig: TestDataConfig): Array<Array<Any?>> {
-        val files = getFiles(method.declaringClass, testDataConfig)
+    fun getData(method: Executable, testData: TestData): Array<Array<Any?>> {
+        val files = getFiles(method.declaringClass, testData)
         val defaultFunction = Function<Int,Array<out Any?>?>{
             arrayOf(gson.fromJson(FileUtils.readAsTxt(files[it]),method.parameterTypes[it]))
         }
@@ -24,16 +25,16 @@ object Json :IDataProvider {
         return ScriptUtils.getDataTemplate(method.parameters.toList(),files,defaultFunction,otherFunction)
     }
 
-    override fun getData(para: Parameter, testDataConfig: TestDataConfig): List<Any?>? {
-        return getFiles(para.declaringExecutable.declaringClass,testDataConfig).map {
+    override fun getData(para: Parameter, testData: TestData): List<Any?>? {
+        return getFiles(para.declaringExecutable.declaringClass,testData).map {
             gson.fromJson(FileUtils.readAsTxt(it),para.type)
         }
     }
 
-    private fun getFiles(cls:Class<*>,testDataConfig:TestDataConfig): List<File> {
-        val filePaths = when(testDataConfig.paras.isEmpty()){
+    private fun getFiles(cls:Class<*>,testData: TestData): List<File> {
+        val filePaths = when(testData.paras.isEmpty()){
             true -> listOf("${cls.getClassFolder()}/${cls.simpleName}.json")
-            else -> testDataConfig.paras.map { "${cls.getClassFolder()}/$it" }
+            else -> testData.paras.map { "${cls.getClassFolder()}/$it" }
         }
         return filePaths.map { File(it) }
     }

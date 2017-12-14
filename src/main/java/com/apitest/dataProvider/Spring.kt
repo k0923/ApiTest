@@ -1,5 +1,6 @@
 package com.apitest.dataProvider
 
+import com.apitest.annotations.TestData
 import com.apitest.utils.PathUtils.getClassFolder
 import com.apitest.utils.ScriptUtils
 import com.apitest.utils.SpringUtils
@@ -11,9 +12,12 @@ import java.util.function.Function
 import java.util.regex.Pattern
 
 object Spring:IDataProvider{
+    override fun clone(para: Parameter, testData: TestData, currentData: List<Any?>?): List<Any?>? {
+        return getData(para,testData)
+    }
 
-    override fun getData(para: Parameter, testDataConfig: TestDataConfig): List<Any?>? {
-        val ctxs = getContext(para.declaringExecutable.declaringClass,testDataConfig)
+    override fun getData(para: Parameter, testData: TestData): List<Any?>? {
+        val ctxs = getContext(para.declaringExecutable.declaringClass,testData)
         val method = para.declaringExecutable
         val name = method.name.split(".").last()
         val qualifier = para.getAnnotation(Qualifier::class.java)
@@ -37,10 +41,10 @@ object Spring:IDataProvider{
         return data.filter { isMatch(it.key) }.map { it.value }
     }
 
-    private fun getContext(cls:Class<*>,testDataConfig:TestDataConfig):List<ApplicationContext>{
+    private fun getContext(cls:Class<*>,testData:TestData):List<ApplicationContext>{
         return when{
-            testDataConfig.paras.isEmpty() -> listOf(SpringUtils.getContext(cls) ?: throw NullPointerException("No context found of cls $cls"))
-            else->testDataConfig.paras.map {
+            testData.paras.isEmpty() -> listOf(SpringUtils.getContext(cls) ?: throw NullPointerException("No context found of cls $cls"))
+            else->testData.paras.map {
                 SpringUtils.getContext("${cls.getClassFolder()}/$it") ?: throw NullPointerException("No context found of file $it")
             }.toList()
         }
