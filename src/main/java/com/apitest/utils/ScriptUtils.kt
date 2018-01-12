@@ -1,12 +1,13 @@
 package com.apitest.utils
 
 import com.apitest.annotations.FlowTag
-import com.apitest.annotations.TestData
 import com.apitest.core.ApiBaseData
 import com.apitest.core.IDataLifeCycle
 import com.apitest.dataProvider.IDataProvider
 import com.apitest.dataProvider.IParameterProvider
+import com.apitest.dataProvider.SpringDataProvider
 import com.apitest.extensions.ofType
+import com.apitest.nglisteners.ApiTestListener
 import org.apache.logging.log4j.LogManager
 import org.springframework.util.ReflectionUtils
 import org.testng.IHookCallBack
@@ -40,9 +41,11 @@ object ScriptUtils {
         return null
     }
 
-    fun getProvider(cls:KClass<out IDataProvider>):IDataProvider = cls.objectInstance ?: cls.createInstance()
+    //fun getProvider(cls:KClass<out IDataProvider<*>>): IDataProvider<*> = cls.objectInstance ?: cls.createInstance()
 
     fun getInstance(cls:KClass<*>):Any = cls.objectInstance ?: cls.createInstance()
+
+
 
     fun getDataTemplate(params:List<Any?>, other:List<Any?>, configAction:Function<Int,Array<out Any?>?>, otherAction:Function<Int,Array<out Any?>?>):Array<Array<Any?>>{
         val data = Array<Supplier<Array<out Any?>?>>(params.size,{ Supplier { null }})
@@ -56,23 +59,33 @@ object ScriptUtils {
         return CommonUtils.getCartesianProductBySupplier(data)
     }
 
-    fun getTestData(method:Executable):Array<Array<Any?>>{
-        val testDatas = getTestDataConfig(method)
-        val otherAction = Function<Int,Array<out Any?>?>{ getEmptyConfigData(method.parameters[it]) }
-
-        val initDatas = Array(testDatas.size){i-> getProvider(testDatas[i].provider).getData(method.parameters[i],testDatas[i])}
-        val configAction = Function<Int,Array<out Any?>?>{ getProvider(testDatas[it].provider).clone(method.parameters[it],testDatas[it],initDatas[it])?.toTypedArray() }
-        return when(testDatas.size){
-            0-> getDataTemplate(method.parameters.toList(),testDatas.toList(),otherAction,otherAction)
-            else ->getDataTemplate(method.parameters.toList(),testDatas.toList(),configAction,otherAction)
+    fun getTestDataByPara(para:Parameter):Array<out Any?>?{
+        val annotations = para.annotations
+        var provider: IDataProvider? = null
+        var annotation:Annotation? = null
+        annotations.forEach {
+            if(ApiTestListener.dataProviders.containsKey(it.annotationClass.java)){
+                provider = ApiTestListener.dataProviders[it.annotationClass.java]
+                annotation = it
+            }
         }
+        if(provider!=null){
+            val data = provider!!.getData(para,annotation!!)?.toTypedArray()
+            return data
+            //return provider?.getData(para,annotation)?.toTypedArray()
+        }
+        return  getEmptyConfigData(para)
     }
 
 
-    fun getTestDataConfig(method:Executable):Array<TestData>{
-        val testDatas = method.getAnnotationsByType(TestData::class.java)
-        return if(testDatas.isEmpty()) method.declaringClass.getAnnotationsByType(TestData::class.java) else testDatas
+    fun getTestData(method:Executable):Array<Array<Any?>>{
+        val data = Array<Supplier<Array<out Any?>?>>(method.parameterCount,{ Supplier {
+            getTestDataByPara(method.parameters[it])
+        }})
+
+        return CommonUtils.getCartesianProductBySupplier(data)
     }
+
 
 
     fun getEmptyConfigData(para:Parameter):Array<out Any?>?{

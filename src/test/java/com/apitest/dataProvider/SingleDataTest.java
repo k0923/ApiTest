@@ -1,10 +1,8 @@
 package com.apitest.dataProvider;
 
 import com.apitest.annotations.Filter;
-import com.apitest.annotations.TestData;
 import com.apitest.testModels.Console;
 import com.apitest.testModels.Student;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -19,15 +17,13 @@ public class SingleDataTest {
     并且找到id=partA_stu1的Bean
     */
     @Test
-    @TestData
-    public void partA_stu1(Student student){
+    public void partA_stu1(@Spring Student student){
         //在Spring中id=stu1的student的name叫WANG_A
         Assert.assertEquals(student.getName(),"WANG_A");
     }
 
     @Test
-    @TestData
-    public void stu(Student student){
+    public void stu(@Spring Student student){
         //由于Spring中未有id=stu的student,故为空
         Assert.assertNull(student);
     }
@@ -38,8 +34,7 @@ public class SingleDataTest {
     此例中由于正则表达式匹配所有id，所以该用例将会运行多次
      */
     @Test
-    @TestData
-    public void stus(@Qualifier(".+") Student student){
+    public void stus(@Spring(pattern = ".+") Student student){
         Assert.assertNotNull(student);
     }
 
@@ -47,8 +42,7 @@ public class SingleDataTest {
     匹配所有id以partA为开头的student
      */
     @Test
-    @TestData
-    public void partA(@Qualifier("partA.+") Student student){
+    public void partA(@Spring(pattern = "partA.+") Student student){
         Assert.assertNotNull(student);
     }
 
@@ -57,8 +51,7 @@ public class SingleDataTest {
     加入注解TestData,设置paras为SpringDataTest.xml
      */
     @Test
-    @TestData(paras = {"SingleDataTest.xml"})
-    public void outSpringFile(Student student){
+    public void outSpringFile(@Spring(files = {"SingleDataTest.xml"}) Student student){
         //在Spring中id=outFile的student的name叫WANG_A
         Assert.assertEquals(student.getName(),"WANG_A");
     }
@@ -79,9 +72,8 @@ public class SingleDataTest {
     最终返回满足符合过滤器的student
      */
     @Test
-    @TestData
     @Filter(cls = SingleDataTest.class,methods = {"studentFilter1"})
-    public void filterStus(@Qualifier(".+") Student student){
+    public void filterStus(@Spring(pattern = ".+") Student student){
         Assert.assertEquals(student.isMan(),true);
     }
 
@@ -92,8 +84,7 @@ public class SingleDataTest {
     注意：Student的各个属性和CSV的列名相同
      */
     @Test
-    @TestData(provider = Csv.class)
-    public void beanFromCsv(Student student){
+    public void beanFromCsv(@Csv Student student){
         Assert.assertNotNull(student);
     }
 
@@ -101,8 +92,7 @@ public class SingleDataTest {
     也可以使用Map作为CSV的输入类型，key为列名，value为对应的文本
      */
     @Test
-    @TestData(provider = Csv.class)
-    public void mapFromCsv(Map<String,String> student){
+    public void mapFromCsv(@Csv Map<String,String> student){
         Assert.assertNotNull(student);
     }
 
@@ -110,9 +100,8 @@ public class SingleDataTest {
     使用过滤器
      */
     @Test
-    @TestData(provider = Csv.class)
     @Filter(cls = SingleDataTest.class,methods = {"studentFilter1"})
-    public void csvFilter(Student student){
+    public void csvFilter(@Csv Student student){
         Assert.assertEquals(student.isMan(),true);
     }
 
@@ -120,8 +109,7 @@ public class SingleDataTest {
     使用外部数据,使用相对路径
      */
     @Test
-    @TestData(provider = Csv.class,paras = "SingleDataTest.csv")
-    public void outCSVFile(Student student){
+    public void outCSVFile(@Csv(files={"SingleDataTest.csv"}) Student student){
         Assert.assertNotNull(student);
     }
 

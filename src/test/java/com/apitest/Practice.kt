@@ -1,16 +1,12 @@
 package com.apitest
 
 
-import com.apitest.core.baseDataValidTest.TestContext
-import com.apitest.dataProvider.Csv
-import com.apitest.dataProvider.Spring
 import org.testng.ITestContext
 import org.testng.TestRunner
 import org.testng.annotations.DataProvider
 import org.testng.annotations.Factory
 import org.testng.annotations.Test
 import java.lang.reflect.Method
-import kotlin.reflect.full.createInstance
 
 class Practice{
     @Test(dataProviderClass = DP::class,dataProvider = "getData")
@@ -64,13 +60,4 @@ class DP{
     }
 }
 
-class P{
 
-    @Test
-    fun t(){
-       val csv = Csv::class
-
-    }
-
-
-}

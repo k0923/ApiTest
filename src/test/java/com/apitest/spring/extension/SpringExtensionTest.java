@@ -1,7 +1,7 @@
 package com.apitest.spring.extension;
 
 import com.apitest.core.ITestScript;
-import com.apitest.annotations.TestData;
+import com.apitest.dataProvider.Spring;
 import com.apitest.spring.factoryBeans.StringValidatorFactoryBean;
 import com.apitest.validations.FetchMode;
 import com.apitest.validations.StrVltMethod;
@@ -13,43 +13,37 @@ import java.util.Date;
 
 public class SpringExtensionTest implements ITestScript {
     @Test
-    @TestData(paras = "testData.xml")
-    public void dateBeanDefinitionParserTest(Date date){
+    public void dateBeanDefinitionParserTest(@Spring(files = {"testData.xml"}) Date date){
         Date now = new Date();
         long d20 = 20*24*3600*1000;
         Assert.assertTrue(date.getTime()-now.getTime()>d20);
     }
 
     @Test
-    @TestData(paras = "testData.xml")
-    public void systemTimeBeanDefinitionParserTest_pure(Long time){
+    public void systemTimeBeanDefinitionParserTest_pure(@Spring(files = {"testData.xml"}) Long time){
         System.out.println(time);
         Assert.assertNotNull(time);
     }
 
     @Test
-    @TestData(paras = "testData.xml")
-    public void systemTimeBeanDefinitionParserTest_pure_prefix_suffix(String data){
+    public void systemTimeBeanDefinitionParserTest_pure_prefix_suffix(@Spring(files = {"testData.xml"}) String data){
         System.out.println(data);
         Assert.assertNotNull(data);
     }
 
     @Test
-    @TestData(paras="testData.xml")
-    public void envValueBeanDefinitionParserTest(String data){
+    public void envValueBeanDefinitionParserTest(@Spring(files = {"testData.xml"}) String data){
         Assert.assertEquals(data,"sit_abc");
     }
 
 
     @Test
-    @TestData(paras = "testData.xml")
-    public void singletonTimeTest(Long time){
+    public void singletonTimeTest(@Spring(files = {"testData.xml"})Long time){
         //ScriptUtils.INSTANCE.getcon
     }
 
     @Test
-    @TestData(paras="testData.xml")
-    public void strVlt(StringValidator validator){
+    public void strVlt(@Spring(files = {"testData.xml"})StringValidator validator){
         Assert.assertEquals(validator.getProperty(),"abc");
         Assert.assertEquals(validator.getExpect(),"bcd");
         Assert.assertEquals(validator.getMethod(), StrVltMethod.Contains);
@@ -63,20 +57,17 @@ public class SpringExtensionTest implements ITestScript {
     }
 
     @Test
-    @TestData(paras="testData.xml")
-    public void repeatTest(String repeat){
+    public void repeatTest(@Spring(files = {"testData.xml"})String repeat){
         Assert.assertEquals(repeat.length(),512);
     }
 
     @Test
-    @TestData(paras="testData.xml")
-    public void repeatTest2(String repeat){
+    public void repeatTest2(@Spring(files = {"testData.xml"})String repeat){
         Assert.assertEquals(repeat.length(),512);
     }
 
     @Test
-    @TestData(paras="testData.xml")
-    public void repeatTest3(String repeat){
+    public void repeatTest3(@Spring(files = {"testData.xml"})String repeat){
         Assert.assertEquals(repeat.length(),256);
     }
 

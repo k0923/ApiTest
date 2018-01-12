@@ -1,13 +1,12 @@
 package com.apitest.core.baseDataValidTest;
 
-import com.apitest.annotations.TestData;
+import com.apitest.dataProvider.Spring;
 import org.testng.annotations.Test;
 
 public class DataValidTest {
 
     @Test
-    @TestData
-    public void test(TestContext data){
+    public void test(@Spring TestContext data){
         data.validate();
     }
 

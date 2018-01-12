@@ -1,8 +1,6 @@
 package com.apitest.dataProvider;
 
 import com.apitest.annotations.Filter;
-import com.apitest.annotations.TestData;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.testng.Assert;
 import org.testng.annotations.Factory;
 import org.testng.annotations.Test;
@@ -12,9 +10,8 @@ public class FactoryTest {
     private String d;
 
     @Factory
-    @TestData(paras = "SpringDataProviderTest.xml")
     @Filter(cls = FactoryTest.class,methods = "filterData")
-    public FactoryTest(@Qualifier(".+") String data){
+    public FactoryTest(@Spring(files = {"SpringDataProviderTest.xml"},pattern = ".+") String data){
         this.d = data;
     }
 

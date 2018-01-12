@@ -1,8 +1,6 @@
 package com.apitest.dataProvider
 
 import com.apitest.annotations.Filter
-import com.apitest.annotations.TestData
-import com.apitest.annotations.TestDatas
 import com.apitest.testModels.Console
 import com.apitest.testModels.Student
 import org.testng.Assert
@@ -14,9 +12,8 @@ class CsvDataProviderTest {
 //    constructor(console:Console)
 
     @Test
-    @TestData(provider = Csv::class)
     @Filter(cls = ComboDataTest::class,methods = ["outerFilter"])
-    fun test(student: Student, console:Console){
+    fun test(@Csv student: Student, console:Console){
         Assert.assertEquals(student.name,"ZhouYang")
         Assert.assertEquals(student.age,22)
         Assert.assertEquals(student.isMan,true)
@@ -24,14 +21,7 @@ class CsvDataProviderTest {
     }
 
     @Test
-    @TestDatas(
-            value = [
-                TestData(provider = Csv::class),
-                TestData(provider = Csv::class),
-                TestData(provider = Csv::class)
-            ]
-    )
-    fun test1(student: Map<String,String>,stu1:Student,stu2:Map<String,String>){
+    fun test1(@Csv student: Map<String,String>, @Csv stu1:Student, @Csv stu2:Map<String,String>){
         Assert.assertNotNull(student)
     }
 

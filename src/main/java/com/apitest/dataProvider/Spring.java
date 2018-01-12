@@ -1,12 +1,13 @@
-package com.apitest.annotations;
+package com.apitest.dataProvider;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ElementType.METHOD,ElementType.CONSTRUCTOR})
+@Target({ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface TestDatas {
-    TestData[] value();
+public @interface Spring {
+    String[] files() default {};
+    String pattern() default "";
 }

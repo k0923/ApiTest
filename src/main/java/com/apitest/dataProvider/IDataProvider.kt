@@ -1,11 +1,11 @@
 package com.apitest.dataProvider
 
-import com.apitest.annotations.TestData
+import com.apitest.utils.DataUtils
 import java.lang.reflect.Parameter
 
 interface IDataProvider {
 
-    fun getData(para: Parameter, testData: TestData):List<Any?>?
+    fun getData(parameter: Parameter, annotation: Annotation): List<Any?>?
 
-    fun clone(para:Parameter,testData:TestData,currentData:List<Any?>?):List<Any?>?
+
 }

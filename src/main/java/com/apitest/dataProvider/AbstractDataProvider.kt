@@ -1,13 +1,17 @@
 package com.apitest.dataProvider
-
-import com.apitest.annotations.TestData
 import com.apitest.utils.DataUtils
 import java.lang.reflect.Parameter
 
-abstract class AbstractDataProvider : IDataProvider {
+@Suppress("UNCHECKED_CAST")
+abstract class AbstractDataProvider<T:Annotation> : IDataProvider {
 
+    abstract fun getGenericData(para:Parameter,annotation:T):List<Any?>?
 
-    override fun clone(para: Parameter, testData: TestData, currentData: List<Any?>?) : List<Any?>?{
+    override fun getData(parameter: Parameter, annotation: Annotation): List<Any?>? {
+        return getGenericData(parameter,annotation as T)
+    }
+
+    fun clone(para: Parameter, testData: T, currentData: List<Any?>?) : List<Any?>?{
         return currentData?.let { DataUtils.clone(it) }
     }
 

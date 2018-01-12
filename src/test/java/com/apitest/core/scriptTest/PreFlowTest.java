@@ -1,20 +1,18 @@
 package com.apitest.core.scriptTest;
 
-import com.apitest.annotations.TestData;
+import com.apitest.dataProvider.Spring;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class PreFlowTest {
 
     @Test
-    @TestData
-    public void preFlow1(TestFlowData data){
+    public void preFlow1(@Spring TestFlowData data){
         Assert.assertEquals(data.getName(),"preFlowName");
     }
 
     @Test
-    @TestData
-    public void preFlow2(PreFlowData data){
+    public void preFlow2(@Spring PreFlowData data){
         System.out.println(data.getAge());
 
     }

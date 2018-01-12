@@ -1,8 +1,13 @@
 package com.apitest.nglisteners
 
+import com.apitest.dataProvider.Csv
 import com.apitest.annotations.Parallel
+import com.apitest.dataProvider.Spring
 import com.apitest.core.ApiBaseData
 import com.apitest.core.IDataLifeCycle
+import com.apitest.dataProvider.CsvDataProvider
+import com.apitest.dataProvider.IDataProvider
+import com.apitest.dataProvider.SpringDataProvider
 import com.apitest.dataProvider.TestDataProvider
 import com.apitest.utils.ScriptUtils
 import com.apitest.utils.SpringUtils
@@ -18,6 +23,19 @@ class ApiTestListener: IHookable, IAnnotationTransformer2, ISuiteListener,IClass
 
     companion object {
         val dataSet:MutableSet<Any?> = HashSet()
+        val dataProviders:MutableMap<Class<out Annotation>, IDataProvider> = HashMap()
+    }
+
+    init {
+        registerDataProvider(Spring::class.java, SpringDataProvider)
+        registerDataProvider(Csv::class.java, CsvDataProvider)
+    }
+
+    fun  registerDataProvider(cls:Class<out Annotation>,provider: IDataProvider){
+//        if(dataProviders.containsKey(cls)){
+//            throw IllegalArgumentException("annotation:$cls has already been registered by provider:${dataProviders[cls]}")
+//        }
+        dataProviders[cls] = provider
     }
 
     override fun onBeforeClass(testClass: ITestClass?) {
@@ -127,7 +145,6 @@ class ApiTestListener: IHookable, IAnnotationTransformer2, ISuiteListener,IClass
     }
 
     override fun onStart(suite: ISuite?) {
-
     }
 
 }
