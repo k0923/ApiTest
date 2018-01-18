@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="dataSource" class="com.mysql.jdbc.jdbc2.optional.MysqlDataSource">
+        <property name="serverName" value="10.6.19.35"/>
+        <property name="user" value="musical_qapl_w"/>
+        <property name="password" value="HDhzTPmAmaD5pPN1_LKIh4dpLZ9zcUUz"/>
+        <property name="port" value="3307"/>
+        <property name="databaseName" value="musical_qaplat"/>
+    </bean>
+
+    <bean id="sqlSession" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+
+    </bean>
+
+    <bean id="productMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.musical.db.IProduct"></property>
+        <property name="sqlSessionFactory" ref="sqlSession"/>
+    </bean>
+
+    <bean id="test" class="java.lang.String">
+        <constructor-arg value="abc"/>
+    </bean>
+</beans>
