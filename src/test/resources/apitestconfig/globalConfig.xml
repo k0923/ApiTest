@@ -1,14 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:test="http://www.apitest.com/schema/apiTest"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.apitest.com/schema/apiTest http://www.apitest.com/schema/apiTest/apiTest.xsd">
 
     <bean id="dataSource" class="com.mysql.jdbc.jdbc2.optional.MysqlDataSource">
-        <property name="serverName" value="10.6.19.35"/>
-        <property name="user" value="musical_qapl_w"/>
-        <property name="password" value="HDhzTPmAmaD5pPN1_LKIh4dpLZ9zcUUz"/>
-        <property name="port" value="3307"/>
-        <property name="databaseName" value="musical_qaplat"/>
+        <!--<property name="serverName" value="10.6.19.35"/>-->
+        <property name="serverName">
+            <test:env sit="10.6.19.35" dev="10.92.14.239"/>
+        </property>
+        <property name="user">
+            <test:env sit="musical_qapl_w" dev="i18n"/>
+        </property>
+        <property name="password">
+            <test:env sit="HDhzTPmAmaD5pPN1_LKIh4dpLZ9zcUUz" dev="i18n"/>
+        </property>
+        <property name="port">
+            <test:env sit="3307" dev="13306"/>
+        </property>
+        <property name="databaseName">
+            <test:env sit="musical_qaplat" dev="i18n"/>
+        </property>
     </bean>
 
     <bean id="sqlSession" class="org.mybatis.spring.SqlSessionFactoryBean">

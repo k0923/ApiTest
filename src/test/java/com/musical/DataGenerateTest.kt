@@ -47,7 +47,7 @@ class DataGenerateTest {
 
     val insertDatas = ArrayList<Product>()
 
-    val dateFormat = SimpleDateFormat("mm/dd/yyyy")
+    val dateFormat = SimpleDateFormat("mm/dd/yy")
 
     val mapper = GlobalConfig.get(IProduct::class.java)
 

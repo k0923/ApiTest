@@ -30,18 +30,13 @@ class Product{
 
 fun main(args:Array<String>){
 
-    var sql = "insert into t_analyse_result values ("
-    Product::class.memberProperties.forEach{
-        sql += "#{product.${it.name}},"
-    }
-    sql = sql.substring(0,sql.length-1)+")"
+    val props = Product::class.memberProperties.map { it.name }.reduce{p,v->"${p},${v}"}
+    val props1 = Product::class.memberProperties.map{ "#{${it.name}}" }.reduce{p,v->"${p},${v}"}
+    var sql = "insert into t_analyse_result (${props}) values (${props1})"
+
+
     println(sql)
 
-    val s = GlobalConfig.get("test");
-
-    var mapper = GlobalConfig.get(IProduct::class.java)
-    mapper!!.add(Product())
 
 
-    println(UUID.randomUUID().toString().replace("-","").length)
 }

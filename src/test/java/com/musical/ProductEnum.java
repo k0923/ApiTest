@@ -7,6 +7,6 @@ public enum ProductEnum {
     HYPSTAR,
     KWAI,
     MUSE,
-    TITOK,
+    TIKTOK,
     FG
 }
