@@ -7,6 +7,7 @@ open class People : Serializable {
     var id: String = ""
     var age:Int = 0
     var name:String?=null
+    var test:Array<String>? = null
 }
 
 class Student :People() {

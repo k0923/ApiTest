@@ -72,7 +72,7 @@ public class SingleDataTest {
     最终返回满足符合过滤器的student
      */
     @Test
-    @Filter(cls = SingleDataTest.class,methods = {"studentFilter1"})
+    @Filter(cls = SingleDataTest.class,method = "studentFilter1")
     public void filterStus(@Spring(pattern = ".+") Student student){
         Assert.assertEquals(student.isMan(),true);
     }
@@ -100,7 +100,7 @@ public class SingleDataTest {
     使用过滤器
      */
     @Test
-    @Filter(cls = SingleDataTest.class,methods = {"studentFilter1"})
+    @Filter(cls = SingleDataTest.class,method = "studentFilter1")
     public void csvFilter(@Csv Student student){
         Assert.assertEquals(student.isMan(),true);
     }
@@ -136,7 +136,7 @@ public class SingleDataTest {
     自注入,使用过滤器
      */
     @Test
-    @Filter(cls=SingleDataTest.class,methods = {"filterConsole"})
+    @Filter(cls=SingleDataTest.class,method = "filterConsole")
     public void selfInjectFilter(Console console){
         Assert.assertEquals(console,Console.PS4);
     }

@@ -10,7 +10,7 @@ public class FactoryTest {
     private String d;
 
     @Factory
-    @Filter(cls = FactoryTest.class,methods = "filterData")
+    @Filter(cls = FactoryTest.class,method = "filterData")
     public FactoryTest(@Spring(files = {"SpringDataProviderTest.xml"},pattern = ".+") String data){
         this.d = data;
     }
