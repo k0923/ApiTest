@@ -55,11 +55,15 @@ public class ComboDataTest {
 
 
     public static boolean filter4(Student student,String data,String[] args){
+        for(String item : args){
+            System.out.print(item + ",");
+        }
+        System.out.println();
         return false;
     }
 
     @Test
-    @Filter(cls=ComboDataTest.class,method = "filter4",args = {"a"})
+    @Filter(method = "filter4",args = {"a","b"})
     public void filterTest44( @Csv(files={"CsvDataProviderTest.csv"}) Student student
             ,@Spring(files={"SpringDataProviderTest.xml"},pattern = ".+") String data){
         Assert.assertNotNull(data);

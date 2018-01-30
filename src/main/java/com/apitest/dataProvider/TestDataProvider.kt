@@ -24,19 +24,11 @@ class TestDataProvider {
     @DataProvider(parallel = true)
     fun getDataParallel(method: ITestNGMethod,context:ITestContext):Array<Array<Any?>> = getFilterData(method,context)
 
-//    @DataProvider
-//    fun getConstructorData(method:Constructor<Any>):Array<Array<Any?>> = getFilterData(method,context)
-
-
-
-
-
     private fun getFilterData(testNgMethod: ITestNGMethod,context:ITestContext):Array<Array<Any?>>{
         val method = testNgMethod.constructorOrMethod.constructor ?: testNgMethod.constructorOrMethod.method
 
         val filters = method.getAnnotationsByType(Filter::class.java)
         var methodFilters:ArrayList<FilterData>? = null
-        //var methodFilters:ArrayList<Pair<InvokeMode,KFunction<*>>>? = null
         if(filters.isNotEmpty()){
             methodFilters = ArrayList()
             filters.forEach {
@@ -74,11 +66,16 @@ class TestDataProvider {
        if(filter.method.isEmpty()){
            throw NullPointerException("filter should specify the method name")
        }
-        val m = filter.cls.functions.find {
+        var filterCls = filter.cls
+        if(filterCls == Object::class){
+            filterCls = method.declaringClass.kotlin
+        }
+
+        val m = filterCls.functions.find {
             it.name == filter.method
         }
         if (m == null){
-            throw NoSuchMethodException("method:${filter.method} not found in cls:${filter.cls}")
+            throw NoSuchMethodException("method:${filter.method} not found in cls:${filterCls}")
         }
         when{
             //返回类型不匹配

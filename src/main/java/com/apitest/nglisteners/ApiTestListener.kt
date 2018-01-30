@@ -19,7 +19,7 @@ import org.testng.annotations.*
 import java.lang.reflect.Constructor
 import java.lang.reflect.Method
 
-class ApiTestListener: IHookable, IAnnotationTransformer2, ISuiteListener,IClassListener{
+open class ApiTestListener: IHookable, IAnnotationTransformer2, ISuiteListener,IClassListener{
 
     companion object {
         val dataSet:MutableSet<Any?> = HashSet()
