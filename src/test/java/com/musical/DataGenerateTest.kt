@@ -33,7 +33,7 @@ class DataGenerateTest {
         data.country = countryEnum.name
         data.product = productEnum.name
         data.type = productTypeEnum.name
-        data.domain = productTypeEnum.domain.replace("example", productEnum.name)
+        //data.domain = productTypeEnum.domain.replace("example", productEnum.name)
         data.date = date["Date"]
         data.duration = 300 + random.nextInt(300)
         data.connect = 200 + random.nextInt(100)
@@ -53,25 +53,30 @@ class DataGenerateTest {
 
     @Test
     fun insertData(countryEnum: CountryEnum, productEnum: ProductEnum, productTypeEnum: ProductTypeEnum, @Csv(files=["Date.csv"]) date:Map<String,String>){
-        val product = Product()
-        val random = Random()
-        product.file_id = (++count).toString()
-        product.region = countryEnum.name
-        product.product = productEnum.name
-        product.test_type = productTypeEnum.name
-        product.domain_name = productTypeEnum.domain
-        product.ip_address = ""
 
-        product.collect_time = dateFormat.parse(date["Date"])
-        product.url_count = count
-        product.total_duration =  (300 + random.nextInt(300)).toDouble()
-        product.connect_duration = (200 + random.nextInt(100)).toDouble()
-        product.dns_duration = (100 + random.nextInt(100)).toDouble()
-        product.wait_duration = (50+random.nextInt(50)).toDouble()
-        product.receive_duration = (250 + random.nextInt(50)).toDouble()
-        product.body_size = (500 + random.nextInt(500)).toDouble()
-        product.info = " "
-        mapper!!.add(product)
+        productEnum.domains.forEach {
+            val product = Product()
+            val random = Random()
+            product.file_id = (++count).toString()
+            product.region = countryEnum.name
+            product.product = productEnum.name
+            product.test_type = productTypeEnum.name
+            product.domain_name = it
+            product.ip_address = ""
+
+            product.collect_time = dateFormat.parse(date["Date"])
+            product.url_count = count
+            product.total_duration =  (300 + random.nextInt(300)).toDouble()
+            product.connect_duration = (200 + random.nextInt(100)).toDouble()
+            product.dns_duration = (100 + random.nextInt(100)).toDouble()
+            product.wait_duration = (50+random.nextInt(50)).toDouble()
+            product.receive_duration = (250 + random.nextInt(50)).toDouble()
+            product.body_size = (500 + random.nextInt(500)).toDouble()
+            product.info = " "
+            mapper!!.add(product)
+        }
+
+
     }
 
     @AfterClass
