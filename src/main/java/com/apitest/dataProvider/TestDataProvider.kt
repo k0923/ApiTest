@@ -24,26 +24,15 @@ class TestDataProvider {
     @DataProvider(parallel = true)
     fun getDataParallel(method: ITestNGMethod,context:ITestContext):Array<Array<Any?>> = getFilterData(method,context)
 
-//    @DataProvider
-//    fun getConstructorData(method:Constructor<Any>):Array<Array<Any?>> = getFilterData(method,context)
-
-
-
-
-
     private fun getFilterData(testNgMethod: ITestNGMethod,context:ITestContext):Array<Array<Any?>>{
         val method = testNgMethod.constructorOrMethod.constructor ?: testNgMethod.constructorOrMethod.method
 
-
-
-
-
         val filters = method.getAnnotationsByType(Filter::class.java)
-        var methodFilters:ArrayList<Pair<InvokeMode,KFunction<*>>>? = null
+        var methodFilters:ArrayList<FilterData>? = null
         if(filters.isNotEmpty()){
             methodFilters = ArrayList()
             filters.forEach {
-                methodFilters.addAll(getFilter(it,method))
+                methodFilters.add(getFilter(it,method))
             }
         }
         val data = ScriptUtils.getTestData(method)
@@ -51,11 +40,17 @@ class TestDataProvider {
             val filterData = ArrayList<Array<Any?>>()
             data.forEach { d ->
                 if(!fs.any{
-                    it.second.isAccessible = true
-                    val result = when(it.first){
-                        InvokeMode.BySelf -> { it.second.call(testNgMethod.instance,*d)}
-                        InvokeMode.NewCreate -> {it.second.call(it.second.javaMethod!!.declaringClass.newInstance(),*d)}
-                        else -> {it.second.call(*d)}
+                    it.method.isAccessible = true
+                    var tempData = d
+                    if(it.args != null){
+                        val newList = d.toMutableList()
+                        newList.add(it.args)
+                        tempData = newList.toTypedArray()
+                    }
+                    val result = when(it.invokeMode){
+                        InvokeMode.BySelf -> { it.method.call(testNgMethod.instance,*tempData)}
+                        InvokeMode.NewCreate -> {it.method.call(it.method.javaMethod!!.declaringClass.newInstance(),*tempData)}
+                        else -> {it.method.call(*tempData)}
                     }
                     result == false
                 }){
@@ -67,51 +62,50 @@ class TestDataProvider {
         return data
     }
 
-    private fun getFilter(filter: Filter, method:Executable):List<Pair<InvokeMode,KFunction<*>>>{
-        // filter的方法为空
-        if(filter.methods.isEmpty()){
-            throw NullPointerException("filter should specify the method name")
+    private fun getFilter(filter: Filter,method:Executable):FilterData{
+       if(filter.method.isEmpty()){
+           throw NullPointerException("filter should specify the method name")
+       }
+        var filterCls = filter.cls
+        if(filterCls == Object::class){
+            filterCls = method.declaringClass.kotlin
         }
 
-        val methods = filter.cls.functions.filter { filter.methods.contains(it.name) }
-
-        //filter中的方法不存在
-        filter.methods.forEach { m->
-            if(methods.firstOrNull { it.name == m }==null){
-                throw NoSuchMethodException("method:$m not found in cls:${filter.cls}")
-            }
+        val m = filterCls.functions.find {
+            it.name == filter.method
+        }
+        if (m == null){
+            throw NoSuchMethodException("method:${filter.method} not found in cls:${filterCls}")
+        }
+        when{
+            //返回类型不匹配
+            !m.returnType.isSubtypeOf(Boolean::class.createType()) -> throw IllegalArgumentException("the return type of method:${m.name} should be boolean")
+            //参数个数不匹配
+            m.valueParameters.size != method.parameterCount + if(filter.args.size > 0)  1 else 0 -> throw IllegalArgumentException("parameter size not equal")
+            //参数类型不匹配
+            method.parameterTypes.indices.any{!method.parameterTypes[it].kotlin.createType().isSubtypeOf(m.valueParameters[it].type)} -> throw IllegalArgumentException("parameter type not match")
+//            m.valueParameters.indices.any { !m.valueParameters[it].type.isSupertypeOf(method.parameterTypes[it].kotlin.createType()) } -> throw IllegalArgumentException("parameter type not match")
+        }
+        val invokeMode = canCreate(filter,m,method)
+        if(invokeMode == InvokeMode.NotSupport){
+            throw RuntimeException("The method of filter should match one of the following situations:" +
+                    "1. Class of Filter should equal to the declaring class of the method" +
+                    "2. The method of filter should be static " +
+                    "3. The class of filter should contain the 0 arg constructor")
+        }
+        val filterData = FilterData(invokeMode,m)
+        if(filter.args.isNotEmpty()){
+            filterData.args = filter.args
         }
 
-        val validMethods = ArrayList<Pair<InvokeMode,KFunction<*>>>()
-
-        methods.forEach { f->
-            when{
-                //返回类型不匹配
-                !f.returnType.isSubtypeOf(Boolean::class.createType()) -> throw IllegalArgumentException("the return type of method:${f.name} should be boolean")
-                //参数个数不匹配
-                f.valueParameters.size != method.parameterCount -> throw IllegalArgumentException("parameter size not equal")
-                //参数类型不匹配
-                f.valueParameters.indices.any { !f.valueParameters[it].type.isSupertypeOf(method.parameterTypes[it].kotlin.createType()) } -> throw IllegalArgumentException("parameter type not match")
-            }
-
-            val canCreate = canCreate(filter,f,method)
-            if(canCreate == InvokeMode.NotSupport){
-                throw RuntimeException("The method of filter should match one of the following situations:" +
-                        "1. Class of Filter should equal to the declaring class of the method" +
-                        "2. The method of filter should be static " +
-                        "3. The class of filter should contain the 0 arg constructor")
-            }
-
-            validMethods.add(Pair(canCreate,f))
-
-        }
-
-        return validMethods
+        return filterData
     }
+
+
 
     private fun canCreate(filter:Filter,methodFromFilter:KFunction<*>, method:Executable):InvokeMode{
         return when{
-            filter.cls == method.declaringClass && methodFromFilter.javaConstructor == null-> InvokeMode.BySelf //同一个类并且不是filter的方法不是构造函数
+            (filter.cls == method.declaringClass || filter.cls == Object::class.java) && methodFromFilter.javaConstructor == null-> InvokeMode.BySelf //同一个类并且不是filter的方法不是构造函数
             Modifier.isStatic(methodFromFilter.javaMethod!!.modifiers)->InvokeMode.Static //filter中的方法是静态的
             filter.cls.constructors.any { c->c.parameters.isEmpty() } -> InvokeMode.NewCreate //filter中的类有无参构造函数
             else -> InvokeMode.NotSupport

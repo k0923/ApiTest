@@ -20,7 +20,7 @@ public class ComboDataTest {
     }
 
     @Test
-    @Filter(cls = ComboDataTest.class,methods = {"filter1"})
+    @Filter(cls = ComboDataTest.class,method = "filter1")
     public void filterTest1(
             @Csv(files={"CsvDataProviderTest.csv"}) Student student,
             @Spring(files={"SpringDataProviderTest.xml"},pattern = ".+") String data) throws InterruptedException {
@@ -33,7 +33,7 @@ public class ComboDataTest {
     }
 
     @Test
-    @Filter(cls=ComboDataTest.class,methods={"filter2"})
+    @Filter(cls=ComboDataTest.class,method="filter2")
     public void filterTest2(
             @Csv(files={"CsvDataProviderTest.csv"}) Student student
             ,@Spring(files={"SpringDataProviderTest.xml"},pattern = ".+") String data){
@@ -46,8 +46,25 @@ public class ComboDataTest {
     }
 
     @Test
-    @Filter(cls=ComboDataTest.class,methods = {"filter3"})
+    @Filter(cls=ComboDataTest.class,method = "filter3")
     public void filterTest3( @Csv(files={"CsvDataProviderTest.csv"}) Student student
+            ,@Spring(files={"SpringDataProviderTest.xml"},pattern = ".+") String data){
+        Assert.assertNotNull(data);
+        Assert.assertEquals(student.getAge(),200);
+    }
+
+
+    public static boolean filter4(Student student,String data,String[] args){
+        for(String item : args){
+            System.out.print(item + ",");
+        }
+        System.out.println();
+        return false;
+    }
+
+    @Test
+    @Filter(method = "filter4",args = {"a","b"})
+    public void filterTest44( @Csv(files={"CsvDataProviderTest.csv"}) Student student
             ,@Spring(files={"SpringDataProviderTest.xml"},pattern = ".+") String data){
         Assert.assertNotNull(data);
         Assert.assertEquals(student.getAge(),200);
@@ -65,8 +82,9 @@ public class ComboDataTest {
 
 
     @Test
-    @Filter(cls=ComboDataTest.class,methods = {"filter11","filter22"})
-    @Filter(cls=OtherFilters.class,methods = {"filter3"})
+    @Filter(cls=ComboDataTest.class,method = "filter22")
+    @Filter(cls=ComboDataTest.class,method = "filter11")
+    @Filter(cls=OtherFilters.class,method = "filter3")
     public void filterTest4( @Csv(files={"CsvDataProviderTest.csv"}) Student student
             ,@Spring(files={"SpringDataProviderTest.xml"},pattern = ".+") String data){
         Assert.assertEquals(student.getName(),"Test");
@@ -75,7 +93,8 @@ public class ComboDataTest {
     }
 
     @Test
-    @Filter(cls=ComboDataTest.class,methods = {"filter1","filter2"})
+    @Filter(cls=ComboDataTest.class,method = "filter1")
+    @Filter(cls=ComboDataTest.class,method = "filter2")
     public void filterTest5( @Csv(files={"CsvDataProviderTest.csv"}) Student student
             ,@Spring(files={"SpringDataProviderTest.xml"},pattern = ".+") String data){
         Assert.assertEquals(student.getName(),"Test");
@@ -83,8 +102,8 @@ public class ComboDataTest {
     }
 
     @Test
-    @Filter(cls=ComboDataTest.class,methods = {"filter1"})
-    @Filter(cls=ComboDataTest.class,methods = {"filter2"})
+    @Filter(cls=ComboDataTest.class,method = "filter1")
+    @Filter(cls=ComboDataTest.class,method = "filter2")
     public void filterTest6( @Csv(files={"CsvDataProviderTest.csv"}) Student student
             ,@Spring(files={"SpringDataProviderTest.xml"},pattern = ".+") String data){
         Assert.assertEquals(student.getName(),"Test");
@@ -92,8 +111,9 @@ public class ComboDataTest {
     }
 
     @Test(groups = {"p1"})
-    @Filter(cls=ComboDataTest.class,methods = {"filter1"})
-    @Filter(cls=ComboDataTest.class,methods = {"filter2","filter3"})
+    @Filter(cls=ComboDataTest.class,method = "filter1")
+    @Filter(cls=ComboDataTest.class,method = "filter2")
+    @Filter(cls=ComboDataTest.class,method = "filter3")
     public void filterTest7( @Csv(files={"CsvDataProviderTest.csv"}) Student student
             ,@Spring(files={"SpringDataProviderTest.xml"},pattern = ".+") String data){
         Assert.assertEquals(student.getName(),"Test");
@@ -121,7 +141,7 @@ public class ComboDataTest {
     }
 
     @Test(groups = {"p1"})
-    @Filter(cls=ComboDataTest.class,methods = {"filter3"})
+    @Filter(cls=ComboDataTest.class,method = "filter3")
     public void nullTest(@Csv(files={"CsvDataProviderTest.csv"}) Student student
             ,@Spring(files={"SpringDataProviderTest.xml"}) String data){
         Assert.assertNull(data);
@@ -134,7 +154,7 @@ public class ComboDataTest {
     }
 
     @Test(groups = {"p1"})
-    @Filter(cls = ComboDataTest.class,methods = "filterEnum")
+    @Filter(cls = ComboDataTest.class,method = "filterEnum")
     public void enumTest1(Console console){
         Assert.assertEquals(console,Console.PS4);
     }
