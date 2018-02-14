@@ -12,9 +12,17 @@ object GlobalConfig {
 
     private var ctx: AbstractApplicationContext? = null
 
+    fun getCtx():AbstractApplicationContext? {
+        return ctx
+    }
+
     private var lazyCtx:AbstractApplicationContext? = null
 
     var currentEnv: Environment = Environment.sit
+
+    private val testEnvConfigPath = "testEnv.properties"
+
+
 
     private val envConfigPath = "apitestconfig/env.properties"
 
@@ -26,6 +34,8 @@ object GlobalConfig {
 
     private val retryCountPropertyKey = "retryCount"
 
+    private val globalFilePath = "globalFile"
+
     private val retryCountDefault = 5
 
     private val logger = LogManager.getLogger(GlobalConfig::class.java)
@@ -33,25 +43,28 @@ object GlobalConfig {
     private var retryCount:Int =0
 
     init {
-        val envConfigResource = ClassPathResource(envConfigPath)
+        val envConfigResource = ClassPathResource(testEnvConfigPath)
 
         if(envConfigResource.exists()){
             val props = Properties()
             props.load(envConfigResource.inputStream)
-            val value = props.getProperty(envPropertyKey)
-            currentEnv = Environment.valueOf(value.trim().toLowerCase())
-            if(props.containsKey(retryCountPropertyKey)){
-                retryCount = Integer.parseInt(props.getProperty(retryCountPropertyKey))
-                if(retryCount> retryCountDefault || retryCount<0){
-                    throw IllegalArgumentException("Global apitestconfig of retryCount should between 0 and $retryCountDefault")
+            props.getProperty(envPropertyKey)?.let { currentEnv = Environment.valueOf(it.trim().toLowerCase()) }
+            props.getProperty(retryCountPropertyKey)?.let { retryCount = Integer.parseInt(it) }
+            props.getProperty(globalFilePath)?.let {
+                val contextResource = ClassPathResource(it)
+                if(contextResource.exists()){
+                    ctx = SpringUtils.getContext(contextResource);
                 }
             }
+
+
+            if(retryCount> retryCountDefault || retryCount<0){
+                throw IllegalArgumentException("Global apitestconfig of retryCount should between 0 and $retryCountDefault")
+            }
+        }else{
+            logger.warn("未找到配置文件testEnv.properties,全局上下文为空")
         }
 
-        val contextResource = ClassPathResource(globalConfigPath)
-        if(contextResource.exists()){
-            ctx = SpringUtils.getContext(contextResource)
-        }
 
         logger.info("设置当前环境为:$currentEnv")
         logger.info("设置全局的重置次数为:$retryCount")

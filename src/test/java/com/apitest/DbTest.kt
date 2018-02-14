@@ -7,13 +7,12 @@ import org.testng.annotations.Test
 
 class DbTest {
 
-    @Test
-    fun test(@Spring(pattern = "o1") orderId: String) {
-        var mapper = GlobalConfig.get(OrderMapper::class.java)
-        //mapper?.getOrder(mapOf("1" to 1))
-        // println(mapper?.getOrder("2ok3j4ok32421",TestPlugin()))
-        println(mapper?.getOrderByOrderNo(orderId, "ORDER_CLOSED"))
-    }
+//    @Test
+//    fun test(@Spring(pattern = "o1") orderId: String) {
+//        var mapper = GlobalConfig.get(OrderMapper::class.java)
+//
+//        println(mapper?.getOrderByOrderNo(orderId, "ORDER_CLOSED"))
+//    }
 }
 
 

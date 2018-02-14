@@ -1,7 +1,10 @@
 package com.apitest.nglisteners
 
+import com.apitest.annotations.Inject
 import com.apitest.dataProvider.Csv
 import com.apitest.annotations.Parallel
+import com.apitest.annotations.Scope
+import com.apitest.config.GlobalConfig
 import com.apitest.dataProvider.Spring
 import com.apitest.core.ApiBaseData
 import com.apitest.core.IDataLifeCycle
@@ -19,7 +22,7 @@ import org.testng.annotations.*
 import java.lang.reflect.Constructor
 import java.lang.reflect.Method
 
-class ApiTestListener: IHookable, IAnnotationTransformer2, ISuiteListener,IClassListener{
+open class ApiTestListener: IHookable, IAnnotationTransformer2, ISuiteListener,IClassListener{
 
     companion object {
         val dataSet:MutableSet<Any?> = HashSet()
@@ -45,8 +48,12 @@ class ApiTestListener: IHookable, IAnnotationTransformer2, ISuiteListener,IClass
                     if(!dataSet.contains(obj)){
                         dataSet.add(obj)
                         testClass.realClass.declaredFields.forEach { f->
-                            f.getAnnotation(Autowired::class.java)?.let {
-                                val context = SpringUtils.getContext(testClass.realClass)
+                            f.getAnnotation(Inject::class.java)?.let {
+                                val context = when(it.scope){
+                                    Scope.ClassPath -> SpringUtils.getContext(testClass.realClass)
+                                    Scope.Global -> GlobalConfig.getCtx()
+                                }
+
                                 when(context!!.containsBean(f.name)){
                                     true->{
                                         f.isAccessible = true
