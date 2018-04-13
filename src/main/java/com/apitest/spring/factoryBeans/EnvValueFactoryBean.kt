@@ -19,7 +19,7 @@ class EnvValueFactoryBean:FactoryBean<Any>{
     }
 
     override fun getObject(): Any? {
-        var env = GlobalConfig.currentEnv
+        val env = GlobalConfig.currentEnv
         if(envs?.containsKey(env) == true){
             return envs?.get(env)
         }

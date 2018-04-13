@@ -1,6 +1,5 @@
 package com.apitest.utils
 
-import com.apitest.utils.DataUtils.clone
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.ObjectInputStream
@@ -50,7 +49,7 @@ object DataUtils{
     }
 
     fun getSystemTime(prefix:String?=null,suffix:String?=null):String{
-        var time = getSystemTime()
+        val time = getSystemTime()
         return "${prefix ?: ""}$time${suffix ?: ""}"
     }
 

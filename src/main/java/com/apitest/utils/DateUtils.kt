@@ -1,9 +1,5 @@
 package com.apitest.utils
 
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.ObjectInputStream
-import java.io.ObjectOutputStream
 import java.util.*
 import java.util.regex.Pattern
 
@@ -20,7 +16,7 @@ object DateUtils{
     }
 
     fun getDateByBuffer(buffer:String):Date{
-        var time = this.getTimeByBuffer(buffer)
+        val time = this.getTimeByBuffer(buffer)
         return Date(time)
     }
 
@@ -43,8 +39,8 @@ object DateUtils{
     }
 
     private fun getNumber(input:String,unit:String):Long{
-        var regex = "([0-9]+)$unit"
-        var result = getGroup1(input, regex)
+        val regex = "([0-9]+)$unit"
+        val result = getGroup1(input, regex)
         return if(result==null)
             0L
         else
@@ -52,8 +48,8 @@ object DateUtils{
     }
 
     private fun getGroup1(input:String,regex:String):String?{
-        var pattern = Pattern.compile(regex)
-        var y = pattern.matcher(input)
+        val pattern = Pattern.compile(regex)
+        val y = pattern.matcher(input)
         return when{
             y.find()->y.group(1)
             else -> null

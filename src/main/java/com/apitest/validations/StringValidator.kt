@@ -14,7 +14,7 @@ class StringValidator(property:String
             FetchMode.ByContext -> if(expect==null) null else expectCtx?.getValue(expect)?.toString()
             else -> expect
         }
-        var isPass = method.compare(actualValue,expectValue)
+        val isPass = method.compare(actualValue,expectValue)
         return ValidResult(actualValue,expectValue,isPass,method)
     }
 

@@ -15,8 +15,8 @@ class JObject(val jsonStr:String){
     private val ctx:StandardEvaluationContext
 
     init{
-        var gson = Gson()
-        var e = gson.fromJson(jsonStr,JsonElement::class.java)
+        val gson = Gson()
+        val e = gson.fromJson(jsonStr,JsonElement::class.java)
         ctx = when (e) {
             is JsonArray ->StandardEvaluationContext(gson.fromJson(e,List::class.java))
             else -> StandardEvaluationContext(gson.fromJson(e,LinkedTreeMap::class.java))
@@ -25,8 +25,8 @@ class JObject(val jsonStr:String){
 
 
     fun getByPath(path:String):Any?{
-        var path = convertToSpelPath(path)
-        return ctx.getValue(path)
+        val p = convertToSpelPath(path)
+        return ctx.getValue(p)
     }
 
 

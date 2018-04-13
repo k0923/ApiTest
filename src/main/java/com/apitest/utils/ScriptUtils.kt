@@ -157,7 +157,7 @@ object ScriptUtils {
         data.flowData?.forEach {
             var subKey: String? = null
             var key = it.value
-            var y = pattern.matcher(it.key)
+            val y = pattern.matcher(it.key)
             if (y.find()) {
                 key = y.group(1)
                 subKey = y.group(2)

@@ -14,8 +14,8 @@ fun Any.getValueByPath(property: String): Any? {
 }
 
 fun EvaluationContext.getValue(property: String): Any? {
-    var logger = LogManager.getLogger()
-    var parser = SpelExpressionParser()
+    val logger = LogManager.getLogger()
+    val parser = SpelExpressionParser()
     logger.debug("开始从上下文: {} 获取属性：{}", this.rootObject, property)
     val value = parser.parseExpression(property).getValue(this)
     logger.debug("当前属性：{} 的值为: {}", property, value)
@@ -31,7 +31,7 @@ fun Any.setValueByPath(property: String, value: Any?) {
 
 fun EvaluationContext.setValue(property: String, value: Any?) {
     val logger = LogManager.getLogger()
-    var parser = SpelExpressionParser()
+    val parser = SpelExpressionParser()
     try {
         parser.parseExpression(property).setValue(this, value)
     } catch (e: Exception) {

@@ -42,12 +42,12 @@ class ApiTestNamespaceHandler:NamespaceHandlerSupport(){
                     }
                 }
 
-                var scope = element.getAttribute(scopeName)
+                val scope = element.getAttribute(scopeName)
                 if(scope.isNotBlank()){
                     builder.setScope(scope)
                 }
 
-                var parent = element.getAttribute(parentName)
+                val parent = element.getAttribute(parentName)
                 if(parent.isNotBlank()){
                     builder.setParentName(parent)
                 }
