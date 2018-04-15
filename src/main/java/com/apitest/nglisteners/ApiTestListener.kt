@@ -15,7 +15,6 @@ import com.apitest.dataProvider.TestDataProvider
 import com.apitest.utils.ScriptUtils
 import com.apitest.utils.SpringUtils
 import org.springframework.beans.factory.NoSuchBeanDefinitionException
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import org.testng.*
 import org.testng.annotations.*
