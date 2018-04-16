@@ -7,6 +7,7 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
+@Provider(SpringDataProvider.class)
 public @interface Spring {
     String[] files() default {};
     String pattern() default "";

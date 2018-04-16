@@ -7,7 +7,13 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
-@Provider(CsvDataProvider.class)
-public @interface Csv {
-    String[] files() default {};
+@Provider(FuncDataProvider.class)
+public @interface Func {
+
+    Class<?> provider() default Object.class;
+
+    String name() default "";
+
+    String[] args() default {};
+
 }

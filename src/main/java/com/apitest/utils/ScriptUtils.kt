@@ -5,6 +5,7 @@ import com.apitest.core.ApiBaseData
 import com.apitest.core.IDataLifeCycle
 import com.apitest.dataProvider.IDataProvider
 import com.apitest.dataProvider.IParameterProvider
+import com.apitest.dataProvider.Provider
 import com.apitest.dataProvider.SpringDataProvider
 import com.apitest.extensions.ofType
 import com.apitest.nglisteners.ApiTestListener
@@ -20,6 +21,7 @@ import java.util.function.Supplier
 import java.util.regex.Pattern
 import kotlin.reflect.KClass
 import kotlin.reflect.full.createInstance
+import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.isSuperclassOf
 
 object ScriptUtils {
@@ -64,10 +66,12 @@ object ScriptUtils {
         var provider: IDataProvider? = null
         var annotation:Annotation? = null
         annotations.forEach {
-            if(ApiTestListener.dataProviders.containsKey(it.annotationClass.java)){
-                provider = ApiTestListener.dataProviders[it.annotationClass.java]
+            if(ApiTestListener.dataProviders.contains(it.annotationClass)){
+                val providerCls = it.annotationClass.findAnnotation<Provider>()!!.value
+                provider = providerCls.objectInstance ?: providerCls.createInstance()
                 annotation = it
             }
+
         }
         if(provider!=null){
             val data = provider!!.getData(para,annotation!!)?.toTypedArray()

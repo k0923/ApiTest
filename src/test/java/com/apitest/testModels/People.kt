@@ -23,5 +23,10 @@ enum class Console {
     PS4,
     PS3,
     WII,
-    WIIU
+    WIIU;
+
+    init{
+        println("Console")
+    }
 }
+

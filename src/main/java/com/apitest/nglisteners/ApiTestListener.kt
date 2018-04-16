@@ -1,44 +1,52 @@
 package com.apitest.nglisteners
 
 import com.apitest.annotations.Inject
-import com.apitest.dataProvider.Csv
 import com.apitest.annotations.Parallel
 import com.apitest.annotations.Scope
 import com.apitest.config.GlobalConfig
-import com.apitest.dataProvider.Spring
 import com.apitest.core.ApiBaseData
 import com.apitest.core.IDataLifeCycle
-import com.apitest.dataProvider.CsvDataProvider
-import com.apitest.dataProvider.IDataProvider
-import com.apitest.dataProvider.SpringDataProvider
-import com.apitest.dataProvider.TestDataProvider
+import com.apitest.dataProvider.*
 import com.apitest.utils.ScriptUtils
 import com.apitest.utils.SpringUtils
+import com.sun.javaws.exceptions.InvalidArgumentException
 import org.springframework.beans.factory.NoSuchBeanDefinitionException
 import org.springframework.stereotype.Component
 import org.testng.*
 import org.testng.annotations.*
 import java.lang.reflect.Constructor
 import java.lang.reflect.Method
+import kotlin.reflect.KClass
+import kotlin.reflect.full.findAnnotation
+import kotlin.reflect.jvm.jvmName
 
 open class ApiTestListener: IHookable, IAnnotationTransformer2, ISuiteListener,IClassListener{
 
     companion object {
         val dataSet:MutableSet<Any?> = HashSet()
-        val dataProviders:MutableMap<Class<out Annotation>, IDataProvider> = HashMap()
+        val dataProviders:MutableSet<KClass<out Annotation>> = HashSet()
+//        val dataProviders:MutableMap<Class<out Annotation>, IDataProvider> = HashMap()
     }
 
     init {
-        registerDataProvider(Spring::class.java, SpringDataProvider)
-        registerDataProvider(Csv::class.java, CsvDataProvider)
+        registerDataProvider(Spring::class)
+        registerDataProvider(Csv::class)
+        registerDataProvider(Func::class)
     }
 
-    fun  registerDataProvider(cls:Class<out Annotation>,provider: IDataProvider){
-//        if(dataProviders.containsKey(cls)){
-//            throw IllegalArgumentException("annotation:$cls has already been registered by provider:${dataProviders[cls]}")
-//        }
-        dataProviders[cls] = provider
+
+
+
+
+    fun registerDataProvider(cls:KClass<out Annotation>){
+        cls.findAnnotation<Provider>() ?: throw IllegalArgumentException(cls.simpleName)
+        dataProviders.add(cls)
     }
+
+//    fun  registerDataProvider(cls:Class<out Annotation>,provider: IDataProvider){
+//
+//        dataProviders[cls] = provider
+//    }
 
     override fun onBeforeClass(testClass: ITestClass?) {
         synchronized(dataSet){
