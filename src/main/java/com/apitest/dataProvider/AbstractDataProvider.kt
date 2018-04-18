@@ -7,8 +7,13 @@ abstract class AbstractDataProvider<T:Annotation> : IDataProvider {
 
     abstract fun getGenericData(para:Parameter,annotation:T,testInstance:Any?):List<Any?>?
 
-    override fun getData(parameter: Parameter, annotation: Annotation,testInstance:Any?): List<Any?>? {
-        return getGenericData(parameter,annotation as T,testInstance)
+    override fun getData(parameter: Parameter, annotation: Annotation,testInstance:Any?): Array<Any?> {
+        val result = getGenericData(parameter,annotation as T,testInstance)
+        return when{
+            result == null || result.size == 0 -> arrayOfNulls(1)
+            else -> result.toTypedArray()
+        }
+
     }
 
     fun clone(para: Parameter, testData: T, currentData: List<Any?>?) : List<Any?>?{

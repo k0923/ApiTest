@@ -19,24 +19,13 @@ class CustomProviderTest{
 
     }
 
-    @Test
-    fun tmp(){
-        val method = CustomProviderTest::class.java.methods.first { it.name == "getData" && it.returnType.kotlin.isSubclassOf(List::class) }
-        print(method)
-    }
-//    @Test
-//    fun tmp(){
-//        val tp = List::class.createType(listOf(KTypeProjection(KVariance.OUT,Int::class.createType())))
-//        var a = ArrayList<Int>()
-//        print(a.javaClass.kotlin.issu)
-//
-//    }
+
 
 
 
     fun getData(a:String,b:String):List<Int>?{
-//        println(a)
-//        println(b)
+        println(a)
+        println(b)
         val list = ArrayList<Int>()
         (1 .. 5).forEach {
             list.add(it)

@@ -1,6 +1,7 @@
 package com.apitest.dataProvider
 
 import java.lang.reflect.Method
+import java.lang.reflect.Modifier
 import java.lang.reflect.Parameter
 import kotlin.reflect.*
 import kotlin.reflect.full.createType
@@ -16,11 +17,15 @@ object FuncDataProvider : AbstractDataProvider<Func>() {
 
     override fun getGenericData(para: Parameter, annotation: Func,testInstance:Any?): List<Any?>? {
         val method = getMethod(para,annotation)
-        val obj = method.declaringClass?.kotlin?.objectInstance ?: method.declaringClass?.newInstance()
+
+        val obj = when{
+            Modifier.isStatic(method.modifiers) -> null //静态方法
+            method.declaringClass == testInstance?.javaClass -> testInstance //实例方法
+            method.declaringClass.kotlin.objectInstance != null -> method.declaringClass.kotlin.objectInstance //object方法
+            else -> method.declaringClass?.newInstance() //其他类方法
+        }
+
         return method.invoke(obj,*annotation.args) as List<Any?>?
-
-
-
     }
 
 
