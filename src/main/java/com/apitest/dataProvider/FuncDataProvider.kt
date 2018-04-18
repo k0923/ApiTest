@@ -14,7 +14,7 @@ import kotlin.reflect.jvm.javaType
 object FuncDataProvider : AbstractDataProvider<Func>() {
 
 
-    override fun getGenericData(para: Parameter, annotation: Func): List<Any?>? {
+    override fun getGenericData(para: Parameter, annotation: Func,testInstance:Any?): List<Any?>? {
         val method = getMethod(para,annotation)
         val obj = method.declaringClass?.kotlin?.objectInstance ?: method.declaringClass?.newInstance()
         return method.invoke(obj,*annotation.args) as List<Any?>?

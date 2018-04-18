@@ -7,7 +7,7 @@ import java.lang.reflect.Parameter
 import java.util.regex.Pattern
 
 object SpringDataProvider : AbstractDataProvider<Spring>() {
-    override fun getGenericData(parameter: Parameter, annotation: Spring): List<Any?>?  {
+    override fun getGenericData(parameter: Parameter, annotation: Spring,testInstance:Any?): List<Any?>?  {
         val ctxs = getContext(parameter.declaringExecutable.declaringClass,annotation)
         val method = parameter.declaringExecutable
         val name = method.name.split(".").last()

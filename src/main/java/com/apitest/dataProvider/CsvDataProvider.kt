@@ -6,7 +6,7 @@ import java.io.File
 import java.lang.reflect.Parameter
 
 object CsvDataProvider : AbstractDataProvider<Csv>() {
-    override fun getGenericData(parameter: Parameter, annotation: Csv): List<Any?>? {
+    override fun getGenericData(parameter: Parameter, annotation: Csv,testInstance:Any?): List<Any?>? {
         val files = getFiles(parameter.declaringExecutable.declaringClass, annotation)
         val list = ArrayList<Any?>()
         files.forEach { list.addAll(FileUtils.read(it,parameter.type.kotlin)) }

@@ -1,12 +1,12 @@
 package com.apitest.dataProvider
 
-import com.apitest.common.TestMethodLocal
+
 import org.testng.Assert
 import org.testng.annotations.Test
 
 class SpringDataProviderTest{
 
-    var count = TestMethodLocal(0)
+
 
     @Test(groups = ["p1"])
     fun noDataProviderTest(){
@@ -22,14 +22,14 @@ class SpringDataProviderTest{
     @Test(groups = ["p1"])
     fun batchTestData(@Spring(pattern = ".+") data:String){
         System.out.println(data)
-        count.set(count.get()?.plus(1))
+
     }
 
 
 
     @Test(groups = ["p1"])
     fun batchFilterTest(@Spring(pattern = "single.*") data:String){
-        count.set(count.get()?.plus(1))
+
         Assert.assertEquals(data,"singleTestData")
     }
 

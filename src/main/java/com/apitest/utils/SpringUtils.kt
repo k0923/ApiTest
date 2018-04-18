@@ -1,6 +1,5 @@
 package com.apitest.utils
 
-import com.apitest.spring.beanConfig.ApiBaseDataBeanConfigProcessor
 import com.apitest.utils.PathUtils.getResourceFile
 import org.apache.logging.log4j.LogManager
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader
@@ -33,9 +32,10 @@ object SpringUtils{
         if(contextCache.containsKey(resource.file.absolutePath)){
             return contextCache[resource.file.absolutePath]
         }
-        return getContext(mapOf("ApiBaseDataBeanConfigProcessor" to ApiBaseDataBeanConfigProcessor::class.java
-            //,"ApiBatchDataBeanConfigProcessor" to ApiBatchDataBeanConfigProcessor::class.java
-        ),resource)
+//        return getContext(mapOf("ApiBaseDataBeanConfigProcessor" to ApiBaseDataBeanConfigProcessor::class.java
+//            //,"ApiBatchDataBeanConfigProcessor" to ApiBatchDataBeanConfigProcessor::class.java
+//        ),resource)
+        return getContext(null,resource)
     }
 
     @Synchronized

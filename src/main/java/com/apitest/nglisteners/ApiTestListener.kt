@@ -4,12 +4,8 @@ import com.apitest.annotations.Inject
 import com.apitest.annotations.Parallel
 import com.apitest.annotations.Scope
 import com.apitest.config.GlobalConfig
-import com.apitest.core.ApiBaseData
-import com.apitest.core.IDataLifeCycle
 import com.apitest.dataProvider.*
-import com.apitest.utils.ScriptUtils
 import com.apitest.utils.SpringUtils
-import com.sun.javaws.exceptions.InvalidArgumentException
 import org.springframework.beans.factory.NoSuchBeanDefinitionException
 import org.springframework.stereotype.Component
 import org.testng.*
@@ -18,14 +14,12 @@ import java.lang.reflect.Constructor
 import java.lang.reflect.Method
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
-import kotlin.reflect.jvm.jvmName
 
 open class ApiTestListener: IHookable, IAnnotationTransformer2, ISuiteListener,IClassListener{
 
     companion object {
         val dataSet:MutableSet<Any?> = HashSet()
         val dataProviders:MutableSet<KClass<out Annotation>> = HashSet()
-//        val dataProviders:MutableMap<Class<out Annotation>, IDataProvider> = HashMap()
     }
 
     init {
@@ -43,10 +37,6 @@ open class ApiTestListener: IHookable, IAnnotationTransformer2, ISuiteListener,I
         dataProviders.add(cls)
     }
 
-//    fun  registerDataProvider(cls:Class<out Annotation>,provider: IDataProvider){
-//
-//        dataProviders[cls] = provider
-//    }
 
     override fun onBeforeClass(testClass: ITestClass?) {
         synchronized(dataSet){
@@ -85,13 +75,6 @@ open class ApiTestListener: IHookable, IAnnotationTransformer2, ISuiteListener,I
     }
 
     override fun run(callBack: IHookCallBack, testResult: ITestResult) {
-        if(callBack.parameters.size == 1){
-            val data = callBack.parameters[0]
-            if(data is ApiBaseData || data is IDataLifeCycle){
-                ScriptUtils.execute(data,callBack,testResult)
-                return
-            }
-        }
         callBack.runTestMethod(testResult)
     }
 

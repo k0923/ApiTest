@@ -25,6 +25,7 @@ class TestDataProvider {
     fun getDataParallel(method: ITestNGMethod,context:ITestContext):Array<Array<Any?>> = getFilterData(method,context)
 
     private fun getFilterData(testNgMethod: ITestNGMethod,context:ITestContext):Array<Array<Any?>>{
+
         val method = testNgMethod.constructorOrMethod.constructor ?: testNgMethod.constructorOrMethod.method
 
         val filters = method.getAnnotationsByType(Filter::class.java)
@@ -35,7 +36,7 @@ class TestDataProvider {
                 methodFilters.add(getFilter(it,method))
             }
         }
-        val data = ScriptUtils.getTestData(method)
+        val data = ScriptUtils.getTestData(method,testNgMethod.instance)
         methodFilters?.let { fs ->
             val filterData = ArrayList<Array<Any?>>()
             data.forEach { d ->
