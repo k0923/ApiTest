@@ -3,6 +3,7 @@ package com.apitest.dataProvider;
 
 import com.apitest.testModels.Console;
 import org.jetbrains.annotations.Nullable;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
@@ -36,4 +37,19 @@ public class DefaultPara implements IParameterProvider<DefaultPara> {
     public void t1(DefaultPara para,Console console){
 
     }
+
+    @Test
+    public void t2(String a,Console console){
+        Assert.assertEquals(a,null);
+    }
+
+    @Test
+    public void t3(@Func(name = "getStr")String a,Console console){
+        
+    }
+
+    public List<String> getStr(){
+        return null;
+    }
+
 }

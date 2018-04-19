@@ -2,6 +2,7 @@ package com.apitest.dataProvider
 
 import com.apitest.annotations.Filter
 import com.apitest.utils.ScriptUtils
+import org.apache.logging.log4j.LogManager
 import org.testng.ITestContext
 import org.testng.ITestNGMethod
 import org.testng.annotations.DataProvider
@@ -17,6 +18,8 @@ import kotlin.reflect.jvm.javaConstructor
 import kotlin.reflect.jvm.javaMethod
 
 class TestDataProvider {
+
+    private val logger = LogManager.getLogger(TestDataProvider::class.java)
 
     @DataProvider
     fun getData(method: ITestNGMethod,context:ITestContext):Array<Array<Any?>> = getFilterData(method,context)
@@ -59,6 +62,9 @@ class TestDataProvider {
                 }
             }
             return filterData.toTypedArray()
+        }
+        if (data.size == 0){
+            logger.error("No data for method:$testNgMethod")
         }
         return data
     }

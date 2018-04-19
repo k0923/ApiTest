@@ -30,6 +30,10 @@ object DataUtils{
         }
     }
 
+    fun cloneObj(obj:Any?):Any?{
+        return clone(obj)
+    }
+
     fun <T:Serializable> T.clone():T{
         val byteOutStream = ByteArrayOutputStream()
         val outputStream = ObjectOutputStream(byteOutStream)

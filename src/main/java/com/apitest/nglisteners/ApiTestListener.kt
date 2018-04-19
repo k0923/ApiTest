@@ -26,6 +26,8 @@ open class ApiTestListener: IHookable, IAnnotationTransformer2, ISuiteListener,I
         registerDataProvider(Spring::class)
         registerDataProvider(Csv::class)
         registerDataProvider(Func::class)
+        registerDataProvider(Value::class)
+        registerDataProvider(Json::class)
     }
 
 
