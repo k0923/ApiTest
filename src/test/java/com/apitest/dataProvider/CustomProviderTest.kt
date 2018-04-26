@@ -1,6 +1,7 @@
 package com.apitest.dataProvider
 
 import com.apitest.testModels.Console
+import com.sun.javaws.exceptions.InvalidArgumentException
 import org.testng.annotations.Test
 import java.util.*
 import kotlin.reflect.KTypeProjection
@@ -17,6 +18,16 @@ class CustomProviderTest{
     @Test
     fun test(console: Console,@Func(name = "getData",args = ["1","2"]) myData: Int?){
 
+    }
+
+    @Test
+    fun t2(console:Console,@Func(name = "getData2") myData:Int?){
+
+    }
+
+    fun getData2():List<Int>?{
+        throw InvalidArgumentException(arrayOf("abc"))
+        //return (1 .. 5).toList()
     }
 
 

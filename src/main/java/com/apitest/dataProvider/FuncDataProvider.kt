@@ -10,10 +10,12 @@ import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.isSubtypeOf
 import kotlin.reflect.jvm.javaMethod
 import kotlin.reflect.jvm.javaType
+import org.apache.logging.log4j.LogManager
 
 
 object FuncDataProvider : AbstractDataProvider<Func>() {
 
+    private val logger = LogManager.getLogger(FuncDataProvider::class.java)
 
     override fun getGenericData(para: Parameter, annotation: Func,testInstance:Any?): List<Any?>? {
         val method = getMethod(para,annotation)
@@ -24,8 +26,12 @@ object FuncDataProvider : AbstractDataProvider<Func>() {
             method.declaringClass.kotlin.objectInstance != null -> method.declaringClass.kotlin.objectInstance //object方法
             else -> method.declaringClass?.newInstance() //其他类方法
         }
-
-        return method.invoke(obj,*annotation.args) as List<Any?>?
+        try{
+            return method.invoke(obj,*annotation.args) as List<Any?>?
+        }catch(e:Exception){
+            logger.error("error occured in data provider method:$method")
+            throw e
+        }
     }
 
 

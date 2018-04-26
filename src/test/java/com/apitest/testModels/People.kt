@@ -18,11 +18,5 @@ class Student :People() {
     }
 }
 
-enum class Console {
-    XBOX,
-    PS4,
-    PS3,
-    WII,
-    WIIU;
-}
+
 
